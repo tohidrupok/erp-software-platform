@@ -672,4 +672,4 @@ def reached_product(request, need_id):
 
     need.save()
  
-    return redirect('demand_check')
+    return redirect('demand_check') 

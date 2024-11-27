@@ -109,10 +109,26 @@ def products(request):
     product_quantity = Product.objects.filter(name='')
     if request.method == 'POST':
         form = ProductForm(request.POST)
+
         if form.is_valid():
-            form.save()
-            product_name = form.cleaned_data.get('name')
-            messages.success(request, f'{product_name} has been added')
+            # Save the new product
+            product = form.save()
+
+            # Get the stock quantity from the form
+            stock_quantity = form.cleaned_data.get('stock_quantity')
+
+            # Get or create the stock for the current user
+            stock, _ = Stock.objects.get_or_create(customer=request.user)
+
+            StockItem.objects.create(
+                stock=stock,
+                product=product,
+                available_stock=stock_quantity, 
+                reserved_stock=0,               
+            )
+
+            # Success message
+            messages.success(request, f'{product.name} has been added with {stock_quantity} units in stock.')
             return redirect('dashboard-products')
     else:
         form = ProductForm()
@@ -131,7 +147,6 @@ def products(request):
         'is_admin': is_admin
     }
     return render(request, 'dashboard/products.html', context)
-
 
 
 
@@ -242,50 +257,37 @@ def dealers_demand(request):
 
 
 
-
- 
-
-from django.shortcuts import get_object_or_404, redirect
-from django.http import HttpResponse
-
-from django.contrib import messages
 @login_required(login_url='user-login')
 @allowed_users(allowed_roles=['Admin'])
 def delivery_done(request, need_id): 
-    # Get the DealerProductNeed object
     need = get_object_or_404(DealerProductNeed, id=need_id)
     
-    # Check if the product exists
     if not need.product:
         messages.error(request, "Product does not exist.")
         return redirect('dealers_demand') 
-    
-    # Check if stock is sufficient
-    if need.product.stock_quantity is None:
-        messages.error(request, "Product stock is not defined.")
+
+    stock, _ = Stock.objects.get_or_create(customer=request.user)
+    stock_item = StockItem.objects.filter(stock=stock, product=need.product).first()
+
+    if not stock_item:
+        messages.error(request, "Stock item for this product does not exist.")
         return redirect('dealers_demand') 
-    
-    if need.product.stock_quantity < need.demand_quantity:
+
+    if stock_item.available_stock < need.demand_quantity:
         messages.error(request, "Insufficient stock to fulfill the demand.")
         return redirect('dealers_demand') 
-    
-    # Deduct stock and update status 
+
     if need.status == 'HOS_Approve':
-        need.product.stock_quantity -= need.demand_quantity
-        need.product.save()
-        need.status = "Admin_Approve"  
-        need.admin_flag= True
+        stock_item.available_stock -= need.demand_quantity  
+        stock_item.save()
+
+        need.status = "Admin_Approve"
+        need.admin_flag = True
         need.save()
+        
         messages.success(request, "Delivery marked as complete and stock updated.")
     
-    
-    return redirect('dealers_demand') 
-
-
-
-
-
-
+    return redirect('dealers_demand')
 
 
 
@@ -340,3 +342,39 @@ def offer_delete(request, pk):
     offer = get_object_or_404(Offer, pk=pk)
     offer.delete()
     return redirect('offer_list') 
+
+#stock management
+
+
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['Admin'])
+def admin_stocks(request):
+
+    stocks = Stock.objects.filter(customer=request.user).prefetch_related('stock_items')
+
+    is_admin = request.user.groups.filter(name='Admin').exists()
+    context = {
+        'stocks': stocks,
+        'is_admin': is_admin,
+    }
+    return render(request, 'admin/admin_stocks.html', context)  
+
+
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['Admin'])
+def manage_stock_view(request, pk, action):
+    stock, _ = Stock.objects.get_or_create(customer=request.user)
+    stock_item = get_object_or_404(stock.stock_items, pk=pk)
+    quantity = int(request.POST.get("quantity", 0))
+
+    if action == "add":
+        stock_item.add_stock(quantity)
+    elif action == "remove":
+        stock_item.remove_stock(quantity)
+    elif action == "reserve":
+        stock_item.reserve_stock(quantity)
+    elif action == "release":
+        stock_item.release_reserved_stock(quantity)
+
+    stock_item.save()
+    return JsonResponse({"success": True, "message": f"Stock {action}d successfully."}) 

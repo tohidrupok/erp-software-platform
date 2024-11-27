@@ -24,7 +24,11 @@ urlpatterns = [
     path('offer/<int:pk>/delete/', views.offer_delete, name='offer_delete'),
 
 
-    path('delivery_done/<int:need_id>/', views.delivery_done, name='delivery_done'),
+    path('delivery_done/<int:need_id>/', views.delivery_done, name='delivery_done'),  
+
+    path('stock/', views.admin_stocks, name='admin_stocks'), 
+
+
    
 
 ]
