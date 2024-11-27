@@ -346,13 +346,13 @@ def offer_delete(request, pk):
 #stock management
 
 
-@login_required(login_url='user-login')
-@allowed_users(allowed_roles=['Admin'])
+
 def admin_stocks(request):
 
     stocks = Stock.objects.filter(customer=request.user).prefetch_related('stock_items')
 
-    is_admin = request.user.groups.filter(name='Admin').exists()
+    is_admin = request.user.groups.filter(name='Admin').exists() 
+    
     context = {
         'stocks': stocks,
         'is_admin': is_admin,
@@ -360,21 +360,58 @@ def admin_stocks(request):
     return render(request, 'admin/admin_stocks.html', context)  
 
 
-@login_required(login_url='user-login')
-@allowed_users(allowed_roles=['Admin'])
-def manage_stock_view(request, pk, action):
-    stock, _ = Stock.objects.get_or_create(customer=request.user)
-    stock_item = get_object_or_404(stock.stock_items, pk=pk)
-    quantity = int(request.POST.get("quantity", 0))
 
-    if action == "add":
-        stock_item.add_stock(quantity)
-    elif action == "remove":
-        stock_item.remove_stock(quantity)
-    elif action == "reserve":
-        stock_item.reserve_stock(quantity)
-    elif action == "release":
-        stock_item.release_reserved_stock(quantity)
+def manage_stock_view(request):
+    if request.method == 'POST':
+        stock_item_id = request.POST.get("stock_item_id")
+        action = request.POST.get("action")
+        quantity = request.POST.get("quantity", "0")
 
-    stock_item.save()
-    return JsonResponse({"success": True, "message": f"Stock {action}d successfully."}) 
+        # Validate the quantity
+        try:
+            quantity = int(quantity)
+            if quantity <= 0:
+                raise ValueError("Quantity must be a positive integer.")
+        except ValueError:
+            messages.error(request, "Invalid quantity.")
+            return admin_stocks(request)
+
+        # Get the stock item
+        stock = Stock.objects.filter(customer=request.user).first()
+        if not stock:
+            messages.error(request, "Stock not found.")
+            return admin_stocks(request)
+
+        stock_item = get_object_or_404(stock.stock_items, id=stock_item_id)
+
+        # Perform the requested action
+        if action == "add":
+            stock_item.available_stock += quantity
+            messages.success(request, f"{quantity} units added to {stock_item.product.name}.")
+        elif action == "remove":
+            if stock_item.available_stock >= quantity:
+                stock_item.available_stock -= quantity
+                messages.success(request, f"{quantity} units removed from {stock_item.product.name}.")
+            else:
+                messages.error(request, "Insufficient stock to remove.")
+        elif action == "reserve":
+            if stock_item.available_stock >= quantity:
+                stock_item.available_stock -= quantity
+                stock_item.reserved_stock += quantity
+                messages.success(request, f"{quantity} units reserved from {stock_item.product.name}.")
+            else:
+                messages.error(request, "Insufficient stock to reserve.")
+        elif action == "release":
+            if stock_item.reserved_stock >= quantity:
+                stock_item.reserved_stock -= quantity
+                stock_item.available_stock += quantity
+                messages.success(request, f"{quantity} units released to available stock for {stock_item.product.name}.")
+            else:
+                messages.error(request, "Insufficient reserved stock to release.")
+        else:
+            messages.error(request, "Invalid action specified.")
+
+        # Save the changes
+        stock_item.save()
+
+    return admin_stocks(request)
