@@ -387,13 +387,17 @@ def manage_stock_view(request):
         # Perform the requested action
         if action == "add":
             stock_item.available_stock += quantity
+            stock_item.count_stock += quantity
             messages.success(request, f"{quantity} units added to {stock_item.product.name}.")
+            
         elif action == "remove":
             if stock_item.available_stock >= quantity:
                 stock_item.available_stock -= quantity
+                stock_item.count_stock -= quantity
                 messages.success(request, f"{quantity} units removed from {stock_item.product.name}.")
             else:
                 messages.error(request, "Insufficient stock to remove.")
+            
         elif action == "reserve":
             if stock_item.available_stock >= quantity:
                 stock_item.available_stock -= quantity

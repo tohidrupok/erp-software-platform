@@ -232,7 +232,8 @@ class StockItem(models.Model):
     stock = models.ForeignKey(Stock, on_delete=models.CASCADE, related_name="stock_items", verbose_name="Stock")
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name="Product")
     available_stock = models.PositiveIntegerField(default=0, verbose_name="Available Stock")
-    reserved_stock = models.PositiveIntegerField(default=0, verbose_name="Reserved Stock")  # Reserved for orders
+    reserved_stock = models.PositiveIntegerField(default=0, verbose_name="Reserved Stock")  
+    count_stock = models.PositiveIntegerField(default=0, verbose_name="Total Count Stock")  
     last_updated = models.DateTimeField(auto_now=True, verbose_name="Last Updated")
 
     def __str__(self):
@@ -242,14 +243,16 @@ class StockItem(models.Model):
         """Add stock for this product."""
         if quantity > 0:
             self.available_stock += quantity
+            self.count_stock += quantity
             self.save()
 
     def remove_stock(self, quantity):
         """Remove stock for this product."""
         if quantity > 0 and self.available_stock >= quantity:
             self.available_stock -= quantity
+            self.count_stock -= quantity
             self.save()
-
+    
     def reserve_stock(self, quantity):
         """Reserve stock for an order."""
         if quantity > 0 and self.available_stock >= quantity:
