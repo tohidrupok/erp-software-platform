@@ -1,0 +1,11 @@
+
+  <h1>Debits List</h1>
+  
+  <ul>
+    {% for debit in debits %}
+      <li>{{ debit.get_type_display }}: {{ debit.amount }} - {{ debit.date }}</li>
+    {% empty %}
+      <li>No debits found.</li>
+    {% endfor %}
+  </ul>
+

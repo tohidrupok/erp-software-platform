@@ -640,6 +640,9 @@ def user_stocks(request):
     return render(request, 'dashboard/dealer_stocks.html', context)
 
 
+from finance.models import Account , Credit , TransactionHistory
+from django.utils.timezone import now
+
 @login_required(login_url='user-login')
 @allowed_users(allowed_roles=['DEALER'])
 def reached_product(request, need_id):
@@ -661,13 +664,32 @@ def reached_product(request, need_id):
         defaults={"available_stock": 0, "reserved_stock": 0}
     )
    
-
+   
     # Update the need's status
     if need.status == 'Admin_Approve':
         stock_item.add_stock(need.demand_quantity)
         need.status = "Received"
         need.dealer_flag= True
+
+        delear_account, created = Account.objects.get_or_create(user=request.user)
+        delear_account.update_balance(need.gross_amount())
+        
         stock_item.save()
+
+        Credit.objects.create(
+            type='order_price',
+            amount=need.gross_amount(),
+            description=f"Dealer {request.user}, Demand price for product:  [{need.product.product_code}, {need.product.name}]",
+            date=now()
+        ) 
+
+        TransactionHistory.objects.create(
+            transaction_type='credit',
+            amount=need.gross_amount(),
+            description=f"Dealer {request.user}, Demand price for [ product Code: {need.product.product_code}, product Name: {need.product.name}]",
+            date=now()
+            
+        ) 
         messages.success(request, "Product received successfully and stock updated.")
 
     need.save()

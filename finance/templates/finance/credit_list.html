@@ -1,0 +1,11 @@
+
+  <h1>Credits List</h1>
+  
+  <ul>
+    {% for credit in credits %}
+      <li>{{ credit.get_type_display }}: {{ credit.amount }} - {{ credit.date }}- {{ credit.description }}</li>
+    {% empty %}
+      <li>No credits found.</li>
+    {% endfor %}
+  </ul>
+

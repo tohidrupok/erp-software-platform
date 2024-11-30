@@ -5,12 +5,13 @@ from dashboard.decorators import auth_users, allowed_users
 from dashboard.forms import ProductForm
 from django.contrib import messages
 
-#offer
+#offer#offer#offer#offer
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from dashboard.models import Offer
 from .forms import OfferForm
+from datetime import date
 
 def home(request):
     customer = User.objects.filter()
@@ -20,14 +21,36 @@ def home(request):
     order = Order.objects.all()
     order_count = order.count()
 
+    dealer_demand = DealerOrder.objects.filter(created_at__date=date.today()).order_by('-created_at')
+    
 
+    for final_order in dealer_demand:
+        filtered_orders = final_order.products.all().order_by('-created_at')
+        final_order.filtered_orders = filtered_orders
+
+        # Calculate the totals for the filtered orders
+        total_quantity = sum(order.demand_quantity for order in filtered_orders)
+        total_amount = sum(order.product.product_dp for order in filtered_orders)
+        total_net_amount = sum(order.demand_quantity * order.product.product_dp for order in filtered_orders)
+        total_gross_amount = sum(order.demand_quantity * order.product.product_dp for order in filtered_orders)
+
+        # Attach the totals to the final_order object for use in the template
+        final_order.total_quantity = total_quantity
+        final_order.total_amount = total_amount
+        final_order.total_net_amount = total_net_amount
+        final_order.total_gross_amount = total_gross_amount
+
+    
     is_admin = request.user.groups.filter(name='Admin').exists()
     context = {
         'customer': customer,
         'customer_count': customer_count,
         'product_count': product_count,
         'order_count': order_count,
-         'is_admin': is_admin
+        'is_admin': is_admin,
+
+        'final_orders': dealer_demand,
+        
     } 
     return render(request, 'home.html', context) 
 
@@ -346,7 +369,8 @@ def offer_delete(request, pk):
 #stock management
 
 
-
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['Admin'])
 def admin_stocks(request):
 
     stocks = Stock.objects.filter(customer=request.user).prefetch_related('stock_items')
@@ -360,14 +384,14 @@ def admin_stocks(request):
     return render(request, 'admin/admin_stocks.html', context)  
 
 
-
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['Admin'])
 def manage_stock_view(request):
     if request.method == 'POST':
         stock_item_id = request.POST.get("stock_item_id")
         action = request.POST.get("action")
         quantity = request.POST.get("quantity", "0")
 
-        # Validate the quantity
         try:
             quantity = int(quantity)
             if quantity <= 0:
@@ -376,7 +400,6 @@ def manage_stock_view(request):
             messages.error(request, "Invalid quantity.")
             return admin_stocks(request)
 
-        # Get the stock item
         stock = Stock.objects.filter(customer=request.user).first()
         if not stock:
             messages.error(request, "Stock not found.")

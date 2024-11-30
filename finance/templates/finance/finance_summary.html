@@ -1,0 +1,11 @@
+
+  <h1>Finance Summary</h1>
+  
+  <ul>
+    {% for summary in summaries %}
+      <li>{{ summary.month }} - Total Credit: {{ summary.total_credit }} - Total Debit: {{ summary.total_debit }} - Profit: {{ summary.monthly_profit }}</li>
+    {% empty %}
+      <li>No finance summaries found.</li>
+    {% endfor %}
+  </ul>
+
