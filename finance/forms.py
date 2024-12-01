@@ -23,7 +23,7 @@ class CreditForm(forms.ModelForm):
 class DebitForm(forms.ModelForm):
     class Meta:
         model = Debit
-        fields = ['type', 'amount', 'description', 'date']
+        fields = ['type', 'amount', 'description' ]
 
 class TransactionHistoryForm(forms.ModelForm):
     class Meta:

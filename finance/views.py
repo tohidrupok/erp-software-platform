@@ -35,7 +35,7 @@ def create_transaction(request):
 @allowed_users(allowed_roles=['Finance'])
 def credit_list(request):
     credits = Credit.objects.all().order_by('-id') 
-    paginator = Paginator(credits, 10)  # Show 10 credits per page
+    paginator = Paginator(credits, 30)  
     
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -52,10 +52,15 @@ def credit_list(request):
 @login_required(login_url='user-login')
 @allowed_users(allowed_roles=['Finance'])
 def debit_list(request):
-    debits = Debit.objects.all()
+    debits = Debit.objects.all().order_by('-id') 
+    paginator = Paginator(debits, 30) 
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     is_finance = request.user.groups.filter(name='Finance').exists()
     context = {
-        'debits': debits,
+        'page_obj': page_obj,
         'is_finance': is_finance
     }
     return render(request, 'finance/debit_list.html', context)
@@ -116,8 +121,8 @@ def add_credit(request):
             return redirect('credit_list')
     else:
         form = CreditForm()
-
-    return render(request, 'finance/add_credit.html', {'form': form})
+    is_finance = request.user.groups.filter(name='Finance').exists()
+    return render(request, 'finance/add_credit.html', {'form': form,'is_finance':is_finance})
 
 @login_required(login_url='user-login')
 @allowed_users(allowed_roles=['Finance'])
@@ -125,11 +130,20 @@ def add_debit(request):
     if request.method == 'POST':
         form = DebitForm(request.POST)
         if form.is_valid():
-            form.save()
+            debit = form.save()
+
+            # Create the transaction history
+            TransactionHistory.objects.create(
+                transaction_type='Debit',
+                amount=debit.amount,
+                description=debit.description, 
+            )
+
             return redirect('debit_list')
     else:
         form = DebitForm()
-    return render(request, 'finance/add_debit.html', {'form': form})
+    is_finance = request.user.groups.filter(name='Finance').exists()
+    return render(request, 'finance/add_debit.html', {'form': form,'is_finance':is_finance})
 
 
 @login_required(login_url='user-login')

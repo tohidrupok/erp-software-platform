@@ -119,20 +119,25 @@
         
         <div class="container">
             <div class="row">
-                <div class="col-12">
+                <div class="col-11">
                     {% if page_obj %}
                     <div class="list-group">
                         {% for credit in page_obj %}
                         <div class="list-group-item d-flex justify-content-between align-items-center">
                             <div class="credit-type">
-                                <strong>{{ credit.get_type_display }}</strong>
-                            </div>
+                                <strong>ID: {{ credit.id }} <br>{{ credit.get_type_display }}</strong>
+                            </div> 
+                            
+                            
                             <div class="credit-details text-end">
                                 <div class="amount">
                                     Amount: <span class="text-success">{{ credit.amount }}</span>
                                 </div>
                                 <div class="date">Date: {{ credit.date }}</div>
+                                <div class="date">Persantage: {{ credit.persantage }}</div>
+                                <div style="color: red;" class="date">Returned amount: {{ credit.returned_amount }}</div>
                                 <div class="description">Description: {{ credit.description }}</div>
+                                
                             </div>
                         </div>
                         {% endfor %}
