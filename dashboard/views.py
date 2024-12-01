@@ -23,12 +23,14 @@ def base(request):
     is_dealer = request.user.groups.filter(name='DEALER').exists()
     is_rsm = request.user.groups.filter(name='RSM').exists()
     is_hos = request.user.groups.filter(name='HOS').exists() 
-
+    is_finance = request.user.groups.filter(name='Finance').exists() 
+    print(is_finance)
     context = {
         'is_sr': is_sr,
         'is_dealer': is_dealer,
         'is_rsm': is_rsm,
         'is_hos': is_hos,
+        'is_finance': is_finance,
 
     }
     return render(request, 'dashboard/base.html', context)
@@ -686,7 +688,7 @@ def reached_product(request, need_id):
         TransactionHistory.objects.create(
             transaction_type='credit',
             amount=need.gross_amount(),
-            description=f"Dealer {request.user}, Demand price for [ product Code: {need.product.product_code}, product Name: {need.product.name}]",
+            description=f"Dealer {request.user}, Demand price for Product Code: [{need.product.product_code}], Product Name: [{need.product.name}]",
             date=now()
             
         ) 

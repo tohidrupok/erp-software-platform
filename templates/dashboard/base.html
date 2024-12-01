@@ -16,6 +16,11 @@
 {% elif is_hos %}
     <script>
         window.location.href = "{% url 'hos_dealer_demand' %}";
+    </script> 
+
+{% elif is_finance %}
+    <script>
+        window.location.href = "{% url 'transaction_history' %}";
     </script>
 
 {% elif user.is_authenticated and user.is_staff and user.is_superuser %}

@@ -170,7 +170,7 @@
 					<a class="has-arrow" href="javascript:;">
 						<div style="color: #FFFFFF; " class="parent-icon"><i class='bx bx-bookmark-heart'></i>
 						</div>
-						<div class="menu-title" style="color: #FFFFFF;">Components - Admin</div>
+						<div class="menu-title" style="color: #FFFFFF;">Activity</div>
 					</a>
 					<ul>
 						<li> <a href="{% url 'dashboard-customers' %}"><i class="bx bx-right-arrow-alt"></i>Employee Activity</a>
@@ -245,6 +245,24 @@
 					</a>
 					<ul>
 						<li> <a href="{% url 'hos_dealer_demand' %}"><i class="bx bx-right-arrow-alt"></i>Dealer's Demand</a>
+						</li>
+						
+												
+					</ul>
+				</li>
+				
+				{% endif %}  
+
+				{% if is_finance %}	
+
+				<li>
+					<a class="has-arrow" href="javascript:;">
+						<div style="color: #FFFFFF; " class="parent-icon"><i class='bx bx-message-square-edit'></i>
+						</div>
+						<div class="menu-title" style="color: #FFFFFF;">Finance</div>
+					</a>
+					<ul>
+						<li> <a href="{% url 'transaction_history' %}"><i class="bx bx-right-arrow-alt"></i>Transaction-History</a>
 						</li>
 						
 												

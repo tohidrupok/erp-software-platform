@@ -58,8 +58,10 @@ def debit_list(request):
 @login_required
 def transaction_history(request):
     transactions = TransactionHistory.objects.all()
+    is_finance = request.user.groups.filter(name='Finance').exists() 
     context = {
         'transactions': transactions,
+        'is_finance':is_finance
     }
     return render(request, 'finance/transaction_history.html', context)
 
