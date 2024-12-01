@@ -44,6 +44,15 @@ class Transaction(models.Model):
 from django.db import models
 from django.utils.timezone import now
 
+class Source(models.Model): 
+    name = models.CharField(max_length=255)  
+    date = models.DateField(default=now) 
+    note = models.TextField(blank=True, null=True)  
+
+    def __str__(self):
+        return self.name
+ 
+
 class Credit(models.Model):
     CREDIT_TYPE_CHOICES = [
         ('loan_bank', 'Loan from Bank'),
@@ -55,9 +64,14 @@ class Credit(models.Model):
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     description = models.TextField(blank=True, null=True)
     date = models.DateField(default=now)
+    source = models.ForeignKey( 
+        Source, 
+        on_delete=models.CASCADE,  
+        related_name='credits'  , blank=True, null=True
+    )
 
     def __str__(self):
-        return f"{self.get_type_display()} - {self.amount}"
+        return f"{self.get_type_display()} - {self.amount}" 
 
 class Debit(models.Model):
     DEBIT_TYPE_CHOICES = [

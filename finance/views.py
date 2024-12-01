@@ -5,6 +5,7 @@ from .forms import TransactionForm
 from dashboard.decorators import allowed_users 
 from .models import Credit, Debit, TransactionHistory, FinanceSummary
 from .forms import CreditForm, DebitForm, TransactionHistoryForm, FinanceSummaryForm
+from django.core.paginator import Paginator
 
 #user bank management
 @login_required
@@ -56,12 +57,20 @@ def debit_list(request):
 @login_required(login_url='user-login')
 @allowed_users(allowed_roles=['Finance'])
 def transaction_history(request):
-    transactions = TransactionHistory.objects.all().order_by('-date')
-    is_finance = request.user.groups.filter(name='Finance').exists() 
+    transactions = TransactionHistory.objects.all().order_by('-id')
+    
+    # Pagination logic
+    paginator = Paginator(transactions, 60)  
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    is_finance = request.user.groups.filter(name='Finance').exists()
+    
     context = {
-        'transactions': transactions,
-        'is_finance':is_finance
+        'page_obj': page_obj, 
+        'is_finance': is_finance
     }
+    
     return render(request, 'finance/transaction_history.html', context)
 
 
@@ -81,10 +90,19 @@ def add_credit(request):
     if request.method == 'POST':
         form = CreditForm(request.POST)
         if form.is_valid():
-            form.save()
+            credit = form.save()
+
+            TransactionHistory.objects.create(
+                transaction_type='credit',
+                amount=credit.amount,
+                description= "I have secured a loan to meet my financial requirements from " +credit.source.name,
+                date=credit.date
+            )
+
             return redirect('credit_list')
     else:
         form = CreditForm()
+
     return render(request, 'finance/add_credit.html', {'form': form})
 
 
