@@ -62,6 +62,8 @@ class Credit(models.Model):
 
     type = models.CharField(max_length=20, choices=CREDIT_TYPE_CHOICES)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
+    persantage = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
+    returned_amount = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     date = models.DateField(default=now)
     source = models.ForeignKey( 

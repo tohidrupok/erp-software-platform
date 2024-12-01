@@ -34,11 +34,17 @@ def create_transaction(request):
 @login_required(login_url='user-login')
 @allowed_users(allowed_roles=['Finance'])
 def credit_list(request):
-    credits = Credit.objects.all() 
-    if(credits):
-        print('yes')
+    credits = Credit.objects.all().order_by('-id') 
+    paginator = Paginator(credits, 10)  # Show 10 credits per page
+    
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    is_finance = request.user.groups.filter(name='Finance').exists()
+    
     context = {
-        'credits': credits,
+        'page_obj': page_obj,
+        'is_finance': is_finance
     }
     return render(request, 'finance/credit_list.html', context)
 
@@ -47,8 +53,10 @@ def credit_list(request):
 @allowed_users(allowed_roles=['Finance'])
 def debit_list(request):
     debits = Debit.objects.all()
+    is_finance = request.user.groups.filter(name='Finance').exists()
     context = {
         'debits': debits,
+        'is_finance': is_finance
     }
     return render(request, 'finance/debit_list.html', context)
 
@@ -92,10 +100,16 @@ def add_credit(request):
         if form.is_valid():
             credit = form.save()
 
+            if credit.source:
+                description = f"I have secured a loan to meet my financial requirements from {credit.source.name}"
+            else:
+                description = "I have secured a loan to meet my financial requirements from an unknown source"
+
+            # Create the transaction history
             TransactionHistory.objects.create(
                 transaction_type='credit',
                 amount=credit.amount,
-                description= "I have secured a loan to meet my financial requirements from " +credit.source.name,
+                description=description, 
                 date=credit.date
             )
 
@@ -104,7 +118,6 @@ def add_credit(request):
         form = CreditForm()
 
     return render(request, 'finance/add_credit.html', {'form': form})
-
 
 @login_required(login_url='user-login')
 @allowed_users(allowed_roles=['Finance'])

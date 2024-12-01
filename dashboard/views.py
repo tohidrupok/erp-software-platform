@@ -41,7 +41,7 @@ def base(request):
 @allowed_users(allowed_roles=['SR']) 
 
 def index(request):
-    today = timezone.now().date()  # Get today's date (timezone-aware)
+    today = timezone.now().date()  
     selected_date = request.GET.get('selected_date', today) 
     zones = Zone.objects.values('name').distinct()
     shops = None
@@ -696,4 +696,4 @@ def reached_product(request, need_id):
 
     need.save()
  
-    return redirect('demand_check') 
+    return redirect('demand_check')   
