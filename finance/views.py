@@ -2,7 +2,11 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Account, Transaction
 from .forms import TransactionForm
+from dashboard.decorators import allowed_users 
+from .models import Credit, Debit, TransactionHistory, FinanceSummary
+from .forms import CreditForm, DebitForm, TransactionHistoryForm, FinanceSummaryForm
 
+#user bank management
 @login_required
 def account_dashboard(request):
     account = Account.objects.get(user=request.user)
@@ -24,20 +28,10 @@ def create_transaction(request):
     return render(request, 'create_transaction.html', {'form': form})
 
 
+#System bank management
 
-
-
-
-
-
-
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from .models import Credit, Debit, TransactionHistory, FinanceSummary
-from .forms import CreditForm, DebitForm, TransactionHistoryForm, FinanceSummaryForm
-from django.contrib.auth.decorators import login_required
-
-@login_required
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['Finance'])
 def credit_list(request):
     credits = Credit.objects.all() 
     if(credits):
@@ -47,7 +41,9 @@ def credit_list(request):
     }
     return render(request, 'finance/credit_list.html', context)
 
-@login_required
+
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['Finance'])
 def debit_list(request):
     debits = Debit.objects.all()
     context = {
@@ -55,9 +51,12 @@ def debit_list(request):
     }
     return render(request, 'finance/debit_list.html', context)
 
-@login_required
+
+
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['Finance'])
 def transaction_history(request):
-    transactions = TransactionHistory.objects.all()
+    transactions = TransactionHistory.objects.all().order_by('-date')
     is_finance = request.user.groups.filter(name='Finance').exists() 
     context = {
         'transactions': transactions,
@@ -65,15 +64,19 @@ def transaction_history(request):
     }
     return render(request, 'finance/transaction_history.html', context)
 
-@login_required
+
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['Finance'])
 def finance_summary(request):
-    summaries = FinanceSummary.objects.all()
+    summaries = FinanceSummary.objects.all().order_by('-date')
     context = {
         'summaries': summaries,
     }
     return render(request, 'finance/finance_summary.html', context)
 
-@login_required
+
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['Finance'])
 def add_credit(request):
     if request.method == 'POST':
         form = CreditForm(request.POST)
@@ -84,7 +87,9 @@ def add_credit(request):
         form = CreditForm()
     return render(request, 'finance/add_credit.html', {'form': form})
 
-@login_required
+
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['Finance'])
 def add_debit(request):
     if request.method == 'POST':
         form = DebitForm(request.POST)
@@ -95,7 +100,9 @@ def add_debit(request):
         form = DebitForm()
     return render(request, 'finance/add_debit.html', {'form': form})
 
-@login_required
+
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['Finance'])
 def add_transaction_history(request):
     if request.method == 'POST':
         form = TransactionHistoryForm(request.POST)
@@ -106,7 +113,9 @@ def add_transaction_history(request):
         form = TransactionHistoryForm()
     return render(request, 'finance/add_transaction_history.html', {'form': form})
 
-@login_required
+
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['Finance'])
 def add_finance_summary(request):
     if request.method == 'POST':
         form = FinanceSummaryForm(request.POST)
