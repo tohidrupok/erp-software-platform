@@ -103,7 +103,7 @@ def finance_summary(request):
         .annotate(total_amount=Sum('amount'))
         .order_by('type')
     )
-
+    
     # Preparing a dictionary for easy template rendering
     credit_summary = {item['type']: item['total_amount'] for item in credit_totals}
     debit_summary = {item['type']: item['total_amount'] for item in debit_totals}

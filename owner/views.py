@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from dashboard.models import *
+from finance.models import *
 from django.contrib.auth.decorators import login_required
 from dashboard.decorators import auth_users, allowed_users
 from dashboard.forms import ProductForm
@@ -12,6 +13,7 @@ from django.utils import timezone
 from dashboard.models import Offer
 from .forms import OfferForm
 from datetime import date
+from django.db.models import Sum
 
 def home(request):
     customer = User.objects.filter()
@@ -41,6 +43,10 @@ def home(request):
         final_order.total_net_amount = total_net_amount
         final_order.total_gross_amount = total_gross_amount
 
+    total_order_price = Credit.objects.filter(type='order_price').aggregate(total=Sum('amount'))['total'] or 0
+    total_debit = Debit.objects.aggregate(total=Sum('amount'))['total'] or 0 
+    
+    profit = total_order_price-total_debit
     
     is_admin = request.user.groups.filter(name='Admin').exists()
     context = {
@@ -51,6 +57,11 @@ def home(request):
         'is_admin': is_admin,
         'offers': active_offers,
         'final_orders': dealer_demand,
+        
+        'total_order_price': total_order_price,
+        'total_debit': total_debit,
+        'profit': profit,
+        
         
     } 
     return render(request, 'home.html', context) 
