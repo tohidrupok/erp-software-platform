@@ -22,7 +22,8 @@ def home(request):
     order_count = order.count()
 
     dealer_demand = DealerOrder.objects.filter(created_at__date=date.today()).order_by('-created_at')
-    
+    now = timezone.now()
+    active_offers = Offer.objects.filter(start_date__lte=now, end_date__gte=now)
 
     for final_order in dealer_demand:
         filtered_orders = final_order.products.all().order_by('-created_at')
@@ -48,7 +49,7 @@ def home(request):
         'product_count': product_count,
         'order_count': order_count,
         'is_admin': is_admin,
-
+        'offers': active_offers,
         'final_orders': dealer_demand,
         
     } 

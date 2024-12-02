@@ -133,12 +133,15 @@
                                 <div class="amount">
                                     Amount: <span class="text-success">{{ credit.amount }}</span>
                                 </div>
-                                <div class="date">Date: {{ credit.date }}</div>
-                                <div class="date">Persantage: {{ credit.persantage }}</div>
-                                <div style="color: red;" class="date">Returned amount: {{ credit.returned_amount }}</div>
+                                {% if credit.get_type_display != "Demand item Price" %}
+                                    <div class="date">Date: {{ credit.date }}</div>
+                                    <div class="date">Percentage: {{ credit.persantage }}</div>
+                                    <div style="color: red;" class="date">Returned amount: {{ credit.returned_amount }}</div>
+                                {% endif %}
+                               
                                 <div class="description">Description: {{ credit.description }}</div>
-                                
                             </div>
+                            
                         </div>
                         {% endfor %}
                     </div>

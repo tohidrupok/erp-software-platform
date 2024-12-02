@@ -427,55 +427,7 @@ def delete_order(request, pk):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#######Dealer#########################Dealer############################# Dealer #######################Dealer########################Dealer####################
+#######Dealer#########################Dealer Start ############################# Dealer Start #######################Dealer Start ########################Dealer Start ####################
 from .models import Order, Product, Shop, Zone
 from user.models import Profile
 
@@ -685,8 +637,9 @@ def reached_product(request, need_id):
             date=now()
         ) 
 
-        TransactionHistory.objects.create(
+        TransactionHistory.objects.create( 
             transaction_type='credit',
+            details = 'order_price',
             amount=need.gross_amount(),
             description=f"Dealer {request.user}, Demand price for Product Code: [{need.product.product_code}], Product Name: [{need.product.name}]",
             date=now()

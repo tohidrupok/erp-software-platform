@@ -34,3 +34,8 @@ class FinanceSummaryForm(forms.ModelForm):
     class Meta:
         model = FinanceSummary
         fields = ['month', 'total_credit', 'total_debit', 'monthly_profit']
+
+
+class DateRangeForm(forms.Form):
+    start_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    end_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))

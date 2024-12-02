@@ -256,93 +256,40 @@
                        <div class="card-header border-bottom bg-transparent">
                         <div class="d-flex align-items-center">
                             <div>
-                                <h6 class="mb-0">Customer Review</h6>
+                                <h6 class="mb-0">Offers Available Today</h6>
                             </div>
                             <div class="font-22 ms-auto"><i class="bx bx-dots-horizontal-rounded"></i>
                             </div>
                         </div>
                     </div>
-                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item bg-transparent">
-                          <div class="d-flex align-items-center">
-                            <img src="assets/images/avatars/avatar-1.png" alt="user avatar" class="rounded-circle" width="55" height="55">
-                          <div class="ms-3">
-                            <h6 class="mb-0">iPhone X <small class="ms-4">08.34 AM</small></h6>
-                            <p class="mb-0 small-font">Sara Jhon : This is svery Nice phone in low budget.</p>
-                          </div>
-                          <div class="ms-auto star">
-                            <i class='bx bxs-star text-warning'></i>
-                            <i class='bx bxs-star text-warning'></i>
-                            <i class='bx bxs-star text-warning'></i>
-                            <i class='bx bxs-star text-light-4'></i>
-                            <i class='bx bxs-star text-light-4'></i>
-                          </div>
-                        </div>
-                        </li>
-                        <li class="list-group-item bg-transparent">
-                          <div class="d-flex align-items-center">
-                            <img src="assets/images/avatars/avatar-2.png" alt="user avatar" class="rounded-circle" width="55" height="55">
-                          <div class="ms-3">
-                            <h6 class="mb-0">Air Pod <small class="ml-4">05.26 PM</small></h6>
-                            <p class="mb-0 small-font">Danish Josh : The brand apple is original !</p>
-                          </div>
-                          <div class="ms-auto star">
-                            <i class='bx bxs-star text-warning'></i>
-                            <i class='bx bxs-star text-warning'></i>
-                            <i class='bx bxs-star text-warning'></i>
-                            <i class='bx bxs-star text-light-4'></i>
-                            <i class='bx bxs-star text-light-4'></i>
-                          </div>
-                        </div>
-                        </li>
-                        <li class="list-group-item bg-transparent">
-                          <div class="d-flex align-items-center">
-                            <img src="assets/images/avatars/avatar-3.png" alt="user avatar" class="rounded-circle" width="55" height="55">
-                          <div class="ms-3">
-                            <h6 class="mb-0">Mackbook Pro <small class="ml-4">06.45 AM</small></h6>
-                            <p class="mb-0 small-font">Jhon Doe : Excllent product and awsome quality</p>
-                          </div>
-                          <div class="ms-auto star">
-                            <i class='bx bxs-star text-warning'></i>
-                            <i class='bx bxs-star text-warning'></i>
-                            <i class='bx bxs-star text-warning'></i>
-                            <i class='bx bxs-star text-light-4'></i>
-                            <i class='bx bxs-star text-light-4'></i>
-                          </div>
-                        </div>
-                        </li>
-                        <li class="list-group-item bg-transparent">
-                          <div class="d-flex align-items-center">
-                            <img src="assets/images/avatars/avatar-4.png" alt="user avatar" class="rounded-circle" width="55" height="55">
-                          <div class="ms-3">
-                            <h6 class="mb-0">Air Pod <small class="ml-4">08.34 AM</small></h6>
-                            <p class="mb-0 small-font">Christine : The brand apple is original !</p>
-                          </div>
-                          <div class="ms-auto star">
-                            <i class='bx bxs-star text-warning'></i>
-                            <i class='bx bxs-star text-warning'></i>
-                            <i class='bx bxs-star text-warning'></i>
-                            <i class='bx bxs-star text-light-4'></i>
-                            <i class='bx bxs-star text-light-4'></i>
-                          </div>
-                        </div>
-                        </li>
-                        <li class="list-group-item bg-transparent">
-                          <div class="d-flex align-items-center">
-                            <img src="assets/images/avatars/avatar-7.png" alt="user avatar" class="rounded-circle" width="55" height="55">
-                          <div class="ms-3">
-                            <h6 class="mb-0">Mackbook <small class="ml-4">08.34 AM</small></h6>
-                            <p class="mb-0 small-font">Michle : The brand apple is original !</p>
-                          </div>
-                          <div class="ms-auto star">
-                            <i class='bx bxs-star text-warning'></i>
-                            <i class='bx bxs-star text-warning'></i>
-                            <i class='bx bxs-star text-warning'></i>
-                            <i class='bx bxs-star text-light-4'></i>
-                            <i class='bx bxs-star text-light-4'></i>
-                          </div>
-                        </div>
-                        </li>
+                     <ul class="list-group list-group-flush"> 
+
+                    <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Product & Code</th>
+                            <th>Discount (%)</th>
+                            <th>Start Date & Time</th>
+                            <th>End Date & Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for offer in offers %}
+                        <tr>
+                            <td>{{ offer.product.name }} -- {{ offer.product.product_code }}</td>
+                            <td>{{ offer.discount_percentage }}%</td>
+                            <td>{{ offer.start_date }}</td>
+                            <td>{{ offer.end_date }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="no-offers">No active offers available.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                        
+                        
                       </ul>
                    </div>
                 </div>
@@ -428,7 +375,42 @@
 
     </div>
 </div>
-
+<style>
+  body {
+      background-color: #f8f9fa;
+  }
+  .container {
+      margin-top: 50px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+  }
+  h1 {
+      color: #28a745; /* Green color for the title */
+      margin-bottom: 20px;
+  }
+  .table {
+      border-collapse: separate;
+      border-spacing: 0 10px;
+  }
+  .table th {
+      background-color: #28a745; /* Green header */
+      color: white;
+  }
+  .table td {
+      background-color: #ffffff;
+      border: 1px solid #dee2e6;
+  }
+  .table tr:hover td {
+      background-color: #f1f1f1;
+  }
+  .no-offers {
+      color: #dc3545; /* Red color for no offers message */
+      text-align: center;
+      font-weight: bold;
+  }
+</style>
 
 {% endif%}
 

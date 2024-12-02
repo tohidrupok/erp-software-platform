@@ -29,6 +29,8 @@
                     <table class="table table-bordered table-striped table-hover">
                         <thead class="bg-dark text-white">
                             <tr>
+                                <th scope="col">Id</th>
+                                <th scope="col">Type</th>
                                 <th scope="col">Transaction Type</th>
                                 <th scope="col">Amount</th>
                                 <th scope="col">Date</th>
@@ -38,7 +40,10 @@
                         <tbody>
                             {% for transaction in page_obj %}
                             <tr class="{% if transaction.transaction_type == 'credit' %}table-success{% else %}table-danger{% endif %}">
+                                
+                                <td>{{ transaction.id}}</td>
                                 <td>{{ transaction.transaction_type|capfirst }}</td>
+                                <td>{{ transaction.details|capfirst }}</td>
                                 <td class="{% if transaction.transaction_type == 'credit' %}text-success{% else %}text-danger{% endif %}">
                                     {{ transaction.amount|floatformat:2 }}
                                 </td>

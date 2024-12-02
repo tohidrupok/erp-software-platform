@@ -86,13 +86,48 @@ def transaction_history(request):
     
     return render(request, 'finance/transaction_history.html', context)
 
-
+from django.db.models import Sum
 @login_required(login_url='user-login')
 @allowed_users(allowed_roles=['Finance'])
 def finance_summary(request):
-    summaries = FinanceSummary.objects.all().order_by('-date')
+    # Aggregating total amounts for each credit type
+    credit_totals = (
+        Credit.objects.values('type')
+        .annotate(total_amount=Sum('amount'))
+        .order_by('type')
+    )
+
+    # Aggregating total amounts for each debit type
+    debit_totals = (
+        Debit.objects.values('type')
+        .annotate(total_amount=Sum('amount'))
+        .order_by('type')
+    )
+
+    # Preparing a dictionary for easy template rendering
+    credit_summary = {item['type']: item['total_amount'] for item in credit_totals}
+    debit_summary = {item['type']: item['total_amount'] for item in debit_totals}
+
+    # Default values for missing types
+    loan_bank = credit_summary.get('loan_bank', 0)
+    own_investment = credit_summary.get('own_investment', 0)
+    order_price = credit_summary.get('order_price', 0)
+
+    cashout = debit_summary.get('cashout', 0)
+    office_cost = debit_summary.get('office_cost', 0)
+    factory_demand = debit_summary.get('factory_demand', 0)
+
+    # Checking if the user belongs to the Finance group
+    is_finance = request.user.groups.filter(name='Finance').exists()
+
     context = {
-        'summaries': summaries,
+        'loan_bank': loan_bank,
+        'own_investment': own_investment,
+        'order_price': order_price,
+        'cashout': cashout,
+        'office_cost': office_cost,
+        'factory_demand': factory_demand,
+        'is_finance': is_finance,
     }
     return render(request, 'finance/finance_summary.html', context)
 
@@ -113,6 +148,7 @@ def add_credit(request):
             # Create the transaction history
             TransactionHistory.objects.create(
                 transaction_type='credit',
+                details = credit.get_type_display(),
                 amount=credit.amount,
                 description=description, 
                 date=credit.date
@@ -135,6 +171,7 @@ def add_debit(request):
             # Create the transaction history
             TransactionHistory.objects.create(
                 transaction_type='Debit',
+                details = debit.get_type_display(),
                 amount=debit.amount,
                 description=debit.description, 
             )
