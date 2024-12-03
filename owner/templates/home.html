@@ -11,7 +11,7 @@
                 <div class="card-body">
                     <a class="text-decoration-none" href="{% url 'dashboard-customers' %}"> 
                     <div class="d-flex align-items-center">
-                        <h5 class="mb-0 text-white">{{ customer_count }}</h5>
+                        <h5 class="mb-0 text-white">{{ customer_count }} Employees</h5>
                         <div class="ms-auto">
                             <i class='bx bx-group fs-3 text-white'></i>
                         </div>
@@ -32,7 +32,7 @@
                      <div class="card-body">
                         <a class="text-decoration-none" href="{% url 'dashboard-products' %}">
                         <div class="d-flex align-items-center">
-                            <h5 class="mb-0 text-white">{{ product_count }}</h5>
+                            <h5 class="mb-0 text-white">{{ product_count }} Products</h5>
                             <div class="ms-auto">
                               <i class='bx bx-package fs-3 text-white'></i>
                           </div>
@@ -54,7 +54,7 @@
                     <div class="card-body">
                         <a class="text-decoration-none" href="{% url 'order' %}"> 
                         <div class="d-flex align-items-center">
-                            <h5 class="mb-0 text-white">{{ order_count }}</h5>
+                            <h5 class="mb-0 text-white">{{ order_count }} Orders</h5>
                             <div class="ms-auto">
                               <i class='bx bx-cart fs-3 text-white'></i>
                           </div>
@@ -75,7 +75,7 @@
                      <div class="card-body">
                       <a class="text-decoration-none" href="{% url 'dealers_demand' %}"> 
                         <div class="d-flex align-items-center">
-                            <h5 class="mb-0 text-white">5630</h5>
+                            <h5 class="mb-0 text-white">{{ demand_count }} Demand</h5>
                             <div class="ms-auto">
                               <i class='bx bx-time fs-3 text-white'></i>
                           </div>
@@ -84,7 +84,7 @@
                             <div class="progress-bar bg-white" role="progressbar" style="width: 55%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                         <div class="d-flex align-items-center text-white">
-                            <p class="mb-0">Total Dealer Order</p>
+                            <p class="mb-0">Total Dealer Demand</p>
                             <p class="mb-0 ms-auto">+2.2%<span><i class='bx bx-up-arrow-alt'></i></span></p>
                         </div></a>
                     </div>

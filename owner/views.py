@@ -22,6 +22,9 @@ def home(request):
     product_count = product.count()
     order = Order.objects.all()
     order_count = order.count()
+    
+    demand = DealerProductNeed.objects.all()
+    demand_count = demand.count()
 
     dealer_demand = DealerOrder.objects.filter(created_at__date=date.today()).order_by('-created_at')
     now = timezone.now()
@@ -54,6 +57,7 @@ def home(request):
         'customer_count': customer_count,
         'product_count': product_count,
         'order_count': order_count,
+        'demand_count': demand_count,
         'is_admin': is_admin,
         'offers': active_offers,
         'final_orders': dealer_demand,
