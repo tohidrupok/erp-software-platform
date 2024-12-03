@@ -84,7 +84,7 @@ class Credit(models.Model):
 
 class Debit(models.Model):
     DEBIT_TYPE_CHOICES = [
-        ('cashout', 'Cashout'),
+        ('Expense', 'Expense'),
         ('office_cost', 'Office Management Cost'),
         ('factory_demand', 'Factory Demand Cash'),
     ]
