@@ -656,10 +656,28 @@ def reached_product(request, need_id):
 
 def dealer_approved(request, need_id): 
     need = get_object_or_404(Order, id=need_id)
-        
-    if need.status != 'Delivered':               
-        need.status = "Delivered"
-        need.save()        
-        messages.success(request, "Successfully delivered to the shop through the SR.")
     
-    return redirect('sr-order') 
+    if not need.name:
+        messages.error(request, "Product does not exist.")
+        return redirect('sr-order') 
+
+    stock, _ = Stock.objects.get_or_create(customer=request.user)
+    stock_item = StockItem.objects.filter(stock=stock, product=need.name).first()
+
+    if not stock_item:
+        messages.error(request, "Stock item for this product does not exist.")
+        return redirect('sr-order') 
+
+    if stock_item.available_stock < need.order_quantity:
+        messages.error(request, "Insufficient stock to fulfill the demand.")
+        return redirect('sr-order') 
+
+    if need.status != 'Delivered':
+        stock_item.available_stock -= need.order_quantity  
+        stock_item.save()
+        need.status = "Delivered"
+        need.save()
+        
+        messages.success(request, "Delivery marked as complete and stock updated.")
+    
+    return redirect('sr-order')
