@@ -650,3 +650,16 @@ def reached_product(request, need_id):
     need.save()
  
     return redirect('demand_check')   
+
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['DEALER'])
+
+def dealer_approved(request, need_id): 
+    need = get_object_or_404(Order, id=need_id)
+        
+    if need.status != 'Delivered':               
+        need.status = "Delivered"
+        need.save()        
+        messages.success(request, "Successfully delivered to the shop through the SR.")
+    
+    return redirect('sr-order') 

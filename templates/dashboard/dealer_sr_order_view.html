@@ -7,12 +7,25 @@
 <div class="page-wrapper">
     <div class="page-content">
         <h2 class="text-center mb-5">Total Orders by All SR</h2>
+        <!-- Display messages -->
+        {% if messages %}
+        <div class="alert-container">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <strong>{{ message.tags|capfirst }}!</strong> {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
 
         <table style="border-radius: 15px; border: 1px solid #ddd; overflow: hidden;" class="table table-hover table-bordered">
 
             <thead style="background-color: #28a745; color: white;">
                 <tr>
-                    <th scope="col">Final Order ID</th>
+                    <th scope="col">ID</th>
                     <th scope="col">Date</th>
                     <th scope="col">Shop</th>
                     <th scope="col">SR</th>
@@ -23,7 +36,7 @@
             <tbody>
                 {% for final_order in final_orders %}
                 <tr>
-                    <td>#10{{ final_order.id }}</td>            
+                    <td>#{{ final_order.id }}</td>            
                     <td>{{ final_order.created_at }}</td>            
                     <td>{{ final_order.shop.shop_name }}, {{ final_order.shop.zone.thana}}, {{ final_order.shop.zone.area}} </td>
                     <td>{{ final_order.customer }}</td>
@@ -50,6 +63,8 @@
                                         <th style="color: rgb(3, 0, 199);">Net Amount</th>
                                         <th style="color: rgb(3, 0, 199);">Discount</th>
                                         <th style="color: rgb(3, 0, 199);">Gross Amount</th>
+                                        <th style="color: rgb(3, 0, 199);">Dealer Action</th>
+                                        <th style="color: rgb(3, 0, 199);">Change</th>
                                     </tr>
                                 </thead>
                                 <tbody> 
@@ -61,7 +76,30 @@
                                         <td>{{ order.order_quantity }}</td>
                                         <td>৳ {{ order.net_amount | floatformat:2 }}</td>
                                         <td>৳ {{ order.discount_amount | floatformat:2 }}</td>
-                                        <td>৳ {{ order.gross_amount | floatformat:2 }}</td>
+                                        <td>৳ {{ order.gross_amount | floatformat:2 }}</td> 
+                                        <td>                                                                                     
+                                                {% if order.status == "Delivered" %}
+                                                   <span class="badge  btn btn-danger btn-sm">Delivered</span>
+                                                  
+                                                {% else %}
+                                                   <a href="{% url 'dealer_approved' order.id %}" class="btn btn-success btn-sm">Mark as Dalevaried</a>
+                                                {% endif %}                                   
+                                        </td> 
+                                        <td>
+                                            {% if order.status != "Delivered" %}
+                                            <a href="{% url 'edit_order' order.id %}" class="btn btn-info btn-lg rounded-circle p-3 d-flex align-items-center justify-content-center" title="Edit Order">
+                                                <i class="fas fa-edit" style="color: white; font-size: 18px;"></i>
+                                            </a>
+                                            <a href="{% url 'delete_order' order.id %}" class="btn btn-danger btn-lg rounded-circle p-3 d-flex align-items-center justify-content-center" title="Delete Order">
+                                                <i class="fas fa-trash-alt" style="color: white; font-size: 18px;"></i>
+                                            </a>
+                                            
+                                            
+                                            {% else %}
+                                            <span class="badge bg-info">No Change</span>  
+                                            {% endif %}
+                                        </td> 
+
                                     </tr>
                                     {% endfor %}
                                 </tbody>                                              
@@ -73,6 +111,7 @@
                                     <td>৳ {{ final_order.total_net_amount | floatformat:2 }}</td>
                                     <td>৳ {{ final_order.total_discount_amount | floatformat:2 }}</td>
                                     <td>৳ {{ final_order.total_gross_amount | floatformat:2 }}</td>
+                                    <td></td>
                                 </tr> 
                             </table>
                         </div>

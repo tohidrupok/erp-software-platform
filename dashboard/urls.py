@@ -28,6 +28,8 @@ urlpatterns = [
     path('dealear/stocks/', views.user_stocks, name='user_stocks'),
     path('demand/<int:pk>/edit/', views.edit_demand, name='edit_demand'),
     path('demand/<int:pk>/delete/', views.delete_demand, name='delete_demand'),
+    
+    path('dealer/approved/<int:need_id>/', views.dealer_approved , name='dealer_approved'),  
 
     
 ]

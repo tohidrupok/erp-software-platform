@@ -35,7 +35,7 @@
             <tbody> 
                 {% for final_order in final_orders %}
                 <tr class="table-light">
-                    <td>#10{{ final_order.id }}</td>
+                    <td>#{{ final_order.id }}</td>
                     <td class="font-weight-bold {% if final_order.status == 'Delivered' %}text-success{% else %}text-success{% endif %}">{{ final_order.status }}</td>
                     <td>{{ final_order.created_at|date:"M d, Y h:i A" }}</td>
                     <td>{{ final_order.dealer }}</td>

@@ -54,7 +54,7 @@
             <tbody>
                 {% for final_order in page_obj %}
                 <tr>
-                    <td>#10{{ final_order.id }}</td>            
+                    <td>#{{ final_order.id }}</td>            
                     <td>{{ final_order.created_at }}</td>            
                     <td>{{ final_order.shop.shop_name }}, {{ final_order.shop.zone.thana}}, {{ final_order.shop.zone.area}} </td>
                     <td>{{ final_order.customer }}</td>
@@ -82,7 +82,7 @@
                                         <th style="color: rgb(3, 0, 199);">Net Amount</th>
                                         <th style="color: rgb(3, 0, 199);">Discount</th>
                                         <th style="color: rgb(3, 0, 199);">Gross Amount</th>
-                                        <th style="color: rgb(3, 0, 199);">Action</th>
+                                        <th style="color: rgb(3, 0, 199);">Change</th>
                                     </tr>
                                 </thead>
                                 <tbody> 
@@ -97,9 +97,13 @@
                                         <td>৳ {{ order.discount_amount | floatformat:2 }}</td>
                                         <td>৳ {{ order.gross_amount | floatformat:2 }}</td>
                                         <td>
-                                            <a href="{% url 'edit_order' order.id %}" class="btn btn-sm btn-warning">Edit</a>
-                                            <a href="{% url 'delete_order' order.id %}" class="btn btn-sm btn-danger">Delete</a>
-                                        </td>
+                                            {% if order.status == "Pending" %}
+                                            <a href="{% url 'edit_order' order.id %}" class="btn btn-sm btn-info"><i class="fas fa-edit" style="color: rgb(242, 242, 245); font-size: 12px;"></i></a>
+                                            <a href="{% url 'delete_order' order.id %}" class="btn btn-sm btn-danger"><i class="fas fa-trash-alt" style="color: rgb(248, 247, 247); font-size: 12px;"></i></a>
+                                            {% else %}
+                                            <span class="badge bg-info">No Change</span>  
+                                            {% endif %}
+                                        </td> 
                                     </tr>
                                     {% endfor %}
                                 </tbody>                                              
