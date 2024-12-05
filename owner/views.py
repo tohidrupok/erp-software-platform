@@ -163,9 +163,10 @@ def products(request):
                 stock=stock,
                 product=product,
                 available_stock=stock_quantity, 
+                count_stock=stock_quantity, 
                 reserved_stock=0,               
             )
-
+            
             # Success message
             messages.success(request, f'{product.name} has been added with {stock_quantity} units in stock.')
             return redirect('dashboard-products')

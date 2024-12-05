@@ -61,7 +61,7 @@
                                             <th>Code</th>
                                             <th>Product</th>
                                             <th>Available Stock</th>
-                                            <th>Reserved Stock</th>
+                                            <th>Total Stock</th>
                                             <th>Last Updated</th>
                                         </tr>
                                     </thead>
@@ -71,7 +71,7 @@
                                             <td>{{ item.product.product_code }}</td>
                                             <td>{{ item.product.name }}</td>
                                             <td class="text-center text-success">{{ item.available_stock }}</td>
-                                            <td class="text-center text-warning">{{ item.reserved_stock }}</td>
+                                            <td class="text-center text-dark">{{ item.count_stock }}</td> 
                                             <td>{{ item.last_updated }}</td>
                                         </tr>
                                         {% endfor %}
