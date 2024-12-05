@@ -76,9 +76,9 @@
                                         <td>
                                             {% if order.admin_flag == False %}                                           
                                                 {% if order.status == "HOS_Approve" %}
-                                                   <a href="{% url 'delivery_done' order.id %}" class="btn btn-success btn-sm">Mark as Delivered</a>
+                                                   <a href="{% url 'delivery_done' order.id %}" class="btn btn-danger btn-sm">Mark as Delivered</a>
                                                 {% else %}
-                                                    <span class="badge  btn btn-success btn-sm">Pending..</span>
+                                                    <span class="badge  btn btn-success btn-sm">HOS Not Authorized</span>
                                                 {% endif %}
                                             {% elif order.admin_flag == True %}
                                                 <span class="badge bg-danger">Delivered</span>

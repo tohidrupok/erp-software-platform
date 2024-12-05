@@ -11,7 +11,7 @@
         <table class="table table-hover table-striped table-bordered">
             <thead class="thead-light">
                 <tr>
-                    <th scope="col">Final Order ID</th>
+                    <th scope="col">Order ID</th>
                     <th scope="col">Date</th>
                     <th scope="col">Shop</th>
                     <th scope="col">SR</th>
@@ -19,11 +19,11 @@
                 </tr>
             </thead>
             <tbody>
-                {% for final_order in final_orders %}
+                {% for final_order in page_obj  %}
                 <tr class="table-light">
-                    <td>#10{{ final_order.id }}</td>     
+                    <td>#{{ final_order.id }}</td>     
                     <td>{{ final_order.created_at }}</td>       
-                    <td>{{ final_order.shop.shop_name }}</td>
+                    <td>{{ final_order.shop.shop_name }}, {{ final_order.shop.zone.thana }}, {{ final_order.shop.zone.district }}</td>
                     <td>{{ final_order.customer }}</td>
                     <td>
                         <!-- Button to toggle details -->
@@ -162,10 +162,74 @@
                 h2 {
                     font-size: 1.5rem;
                 }
+            } 
+
+
+            .pagination {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin: 20px 0;
             }
+            
+            .step-links {
+                font-family: Arial, sans-serif;
+                font-size: 14px;
+                color: #555;
+            }
+            
+            .pagination-link {
+                margin: 0 10px;
+                padding: 10px 15px;
+                background-color: #f0f0f0;
+                border: 1px solid #ddd;
+                color: #007bff;
+                text-decoration: none;
+                border-radius: 5px;
+                transition: background-color 0.3s ease, color 0.3s ease;
+            }
+            
+            .pagination-link:hover {
+                background-color: #007bff;
+                color: #fff;
+            }
+            
+            .pagination-link:disabled {
+                background-color: #ddd;
+                color: #888;
+                cursor: not-allowed;
+            }
+            
+            .current {
+                font-weight: bold;
+                margin: 0 10px;
+            }
+             
         </style>
     </div>
+
+<!-- Pagination Controls -->
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1" class="pagination-link">&laquo; First</a>
+            <a href="?page={{ page_obj.previous_page_number }}" class="pagination-link">Previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="pagination-link">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-link">Last &raquo;</a>
+        {% endif %}
+    </span>
 </div>
+
+
+</div>
+
 
 <br><br><br><br>
 

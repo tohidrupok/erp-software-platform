@@ -25,6 +25,7 @@ urlpatterns = [
 
 
     path('delivery_done/<int:need_id>/', views.delivery_done, name='delivery_done'),  
+    
 
     path('stock/', views.admin_stocks, name='admin_stocks'), 
     path('stock/manage/', views.manage_stock_view, name='manage_stock'),

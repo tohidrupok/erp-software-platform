@@ -9,11 +9,25 @@
         <h2 class="text-center mb-4" style="font-family: 'Arial', sans-serif; color: #f39c12; font-weight: bold; font-size: 2.8rem; letter-spacing: 1.5px; text-transform: uppercase; text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.2); padding: 15px;">
             🚗🔥 All Dealers Demand List 📝🚀 (HOS)
         </h2>
+                <!-- Display messages -->
+                {% if messages %}
+                <div class="alert-container">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            <strong>{{ message.tags|capfirst }}!</strong> {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+    
                
         <table class="table table-hover table-striped table-bordered">
             <thead class="thead-light">
                 <tr>
-                    <th  style="color: black;"scope="col">Final Order ID</th>
+                    <th  style="color: black;"scope="col">Order ID</th>
                     <th  style="color: black;"scope="col">Status</th>
                     <th  style="color: black;"scope="col">Time</th>
                     <th  style="color: black;"scope="col">Dealer</th>
@@ -23,7 +37,7 @@
             <tbody>
                 {% for final_order in final_orders %}
                 <tr class="table-light">
-                    <td>#10{{ final_order.id }}</td>            
+                    <td>#{{ final_order.id }}</td>            
                     <td>{{ final_order.status }}</td>
                     <td>{{ final_order.created_at }}</td>
                     <td>{{ final_order.dealer }}</td>
@@ -49,6 +63,7 @@
                                         <th style="color: black;">DP Price</th>
                                         <th style="color: black;">Net Amount</th>
                                         <th style="color: black;">Gross Amount</th>
+                                        <th style="color: black;">HOS Action</th>
                                     </tr>
                                 </thead>
                                 <tbody> 
@@ -63,6 +78,19 @@
                                         <td>{{ order.product.product_dp  }}</td>
                                         <td>{{ order.net_amount |floatformat:2}}</td>
                                         <td>{{ order.gross_amount |floatformat:2}}</td>
+                                        <td>
+                                            {% if order.hos_flag == False %}                                           
+                                                {% if order.status == "ROS_Approve" %}
+                                                   <a href="{% url 'hos_approved' order.id %}" class="btn btn-success btn-sm">Mark as HOS Approved</a>
+                                                {% else %}
+                                                    <span class="badge  btn btn-success btn-sm">ROS Not Authorized</span>
+                                                {% endif %}
+                                            {% elif order.hos_flag == True %}
+                                                <span class="badge bg-danger">HOS Approved</span>
+                                            {%else%}
+                                            <h1>Error</h1>
+                                            {% endif %}
+                                        </td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>                                              
@@ -76,6 +104,7 @@
                                         <td>৳ {{ final_order.total_amount |floatformat:2}}</td>
                                         <td>৳ {{ final_order.total_net_amount |floatformat:2}}</td>
                                         <td>৳ {{ final_order.total_gross_amount |floatformat:2}}</td>
+                                        <td></td>
                                         
                                     </tr>                                         
                                 

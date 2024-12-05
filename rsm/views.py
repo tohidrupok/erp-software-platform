@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from dashboard.decorators import auth_users, allowed_users
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
+from django.contrib import messages
 
 
 @login_required(login_url='user-login')
@@ -76,6 +77,19 @@ def dealer_demand_check(request):
 
 
 
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['RSM'])
+def rsm_approved(request, need_id): 
+    need = get_object_or_404(DealerProductNeed, id=need_id)
+    
+    if need.status == 'Pending':
+        
+        need.status = "ROS_Approve"
+        need.rsm_flag = True
+        need.save()
+        
+        messages.success(request, "ROS Approve marked as complete and go to Hos panel.")
+    
+    return redirect('dealer_demand_check') 
 
-###HOS###########HOS#########HOS######HOS#####HOS####HOS############HOS########HOS###################HOS#######HOS##############HOS############HOS###################HOS##################HOS##########################################################################
 

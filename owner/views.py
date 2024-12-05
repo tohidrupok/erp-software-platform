@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from dashboard.decorators import auth_users, allowed_users
 from dashboard.forms import ProductForm
 from django.contrib import messages
+from django.core.paginator import Paginator
 
 #offer#offer#offer#offer
 
@@ -230,14 +231,17 @@ def product_delete(request, pk):
 @login_required(login_url='user-login')
 @allowed_users(allowed_roles=['Admin'])
 def final_order_list(request):
-    
-    # Get all FinalOrder objects
+
     final_orders = FinalOrder.objects.all().order_by('-created_at')
+    
+    paginator = Paginator(final_orders, 20)  
+    page_number = request.GET.get('page')  
+    page_obj = paginator.get_page(page_number)  
 
-    for final_order in final_orders:
+    for final_order in page_obj:
+        # Get the filtered orders for each final order
         filtered_orders = final_order.orders.all().order_by('-created_at')
-        final_order.filtered_orders = filtered_orders
-
+        
         # Calculate the totals for the filtered orders
         total_quantity = sum(order.order_quantity for order in filtered_orders)
         total_net_amount = sum(order.order_quantity * order.name.product_tp for order in filtered_orders)
@@ -245,21 +249,21 @@ def final_order_list(request):
         total_discount_amount = sum(order.order_quantity * order.name.discount(order.created_at) for order in filtered_orders)
 
         # Attach the totals to the final_order object for use in the template
+        final_order.filtered_orders = filtered_orders
         final_order.total_quantity = total_quantity
         final_order.total_net_amount = total_net_amount
         final_order.total_gross_amount = total_gross_amount
         final_order.total_discount_amount = total_discount_amount
 
-        
-
-
-    # Pass the final orders to the template
+    # Check if the user is an admin
     is_admin = request.user.groups.filter(name='Admin').exists()
+
+    # Pass the final orders (paginated) and admin status to the template
     context = {
-        'final_orders': final_orders,
+        'page_obj': page_obj,
         'is_admin': is_admin
     }
-    
+
     return render(request, 'dashboard/admin_all_orders.html', context)
 
 

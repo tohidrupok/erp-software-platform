@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from dashboard.decorators import auth_users, allowed_users
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
+from django.contrib import messages
 
 
 # Create your views here.
@@ -49,3 +50,19 @@ def hos_dealer_demand_check(request):
     }
     
     return render(request, 'hos/dealer_demands.html', context)   
+
+
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['HOS'])
+def hos_approved(request, need_id): 
+    need = get_object_or_404(DealerProductNeed, id=need_id)
+    
+    if need.status == 'ROS_Approve':
+        
+        need.status = "HOS_Approve"
+        need.hos_flag = True
+        need.save()
+        
+        messages.success(request, "HOS Approve marked as complete and go to Admin panel.")
+    
+    return redirect('hos_dealer_demand') 
