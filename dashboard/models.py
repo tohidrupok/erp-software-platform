@@ -266,3 +266,6 @@ class StockItem(models.Model):
             self.available_stock += quantity
             self.reserved_stock -= quantity
             self.save()
+
+
+#over
