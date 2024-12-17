@@ -1,0 +1,19 @@
+<!-- hr/dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Dashboard</title>
+</head>
+<body>
+    <h1>HR Dashboard</h1>
+    <nav>
+        <ul>
+            <li><a href="{% url 'attendance_list' %}">Attendance</a></li>
+            <li><a href="{% url 'leave_requests_list' %}">Leave Requests</a></li>
+            <li><a href="{% url 'payroll_list' %}">Payroll</a></li>
+        </ul>
+    </nav>
+</body>
+</html>

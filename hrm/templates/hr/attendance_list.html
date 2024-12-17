@@ -1,0 +1,55 @@
+
+<h2>Attendance List</h2>
+<a href="{% url 'attendance_create' %}">Add Attendance</a>
+<!-- Filter Form -->
+<form method="get" action="">
+    <label for="from_date">From Date:</label>
+    <input type="date" id="from_date" name="from_date" value="{{ from_date }}">
+
+    <label for="to_date">To Date:</label>
+    <input type="date" id="to_date" name="to_date" value="{{ to_date }}">
+
+    <label for="user">User:</label>
+    <select name="user" id="user">
+        <option value="">-- All Users --</option>
+        {% for user in users %}
+        <option value="{{ user.id }}" {% if user_id == user.id|stringformat:"s" %}selected{% endif %}>
+            {{ user.username }}
+        </option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Filter</button>
+</form>
+
+<!-- Attendance Table -->
+<table border="1">
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Check-in Time</th>
+            <th>Check-out Time</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for attendance in attendances %}
+        <tr>
+            <td>{{ attendance.user.username }}</td>
+            <td>{{ attendance.date }}</td>
+            <td>{{ attendance.status }}</td>
+            <td>{{ attendance.check_in_time|default:"-" }}</td>
+            <td>{{ attendance.check_out_time|default:"-" }}</td>
+            <td><a href="{% url 'attendance_update' attendance.pk %}">Edit</a>
+                <a href="{% url 'attendance_delete' attendance.pk %}">Delete</a></td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">No attendance records found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+

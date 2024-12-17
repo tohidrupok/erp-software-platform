@@ -1,0 +1,38 @@
+<!-- hr/leave_requests_list.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leave Requests List</title>
+</head>
+<body>
+    <h1>Leave Requests</h1>
+    <a href="{% url 'leave_request_create' %}">Create Leave Request</a>
+    <table>
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in leave_requests %}
+            <tr>
+                <td>{{ request.user.username }}</td>
+                <td>{{ request.start_date }}</td>
+                <td>{{ request.end_date }}</td>
+                <td>{{ request.status }}</td>
+                <td>
+                    <a href="{% url 'leave_request_update' request.pk %}">Edit</a>
+                    <a href="{% url 'leave_request_delete' request.pk %}">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

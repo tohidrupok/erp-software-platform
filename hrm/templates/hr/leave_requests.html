@@ -1,0 +1,12 @@
+<h2>Leave Requests</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit Request</button>
+</form>
+<h3>Your Leave Requests</h3>
+<ul>
+    {% for leave in leave_requests %}
+    <li>{{ leave.start_date }} to {{ leave.end_date }}: {{ leave.status }}</li>
+    {% endfor %}
+</ul>

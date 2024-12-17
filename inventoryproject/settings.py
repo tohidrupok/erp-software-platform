@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'rsm',
     'hos',
     'finance',
+    'hrm',
 ]
 
 MIDDLEWARE = [

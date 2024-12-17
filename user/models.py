@@ -2,11 +2,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from dashboard.models import Zone, Product
 
-# Create your models here.
-
-
 class Profile(models.Model):
     customer = models.OneToOneField(User, on_delete=models.CASCADE)
+    employee_id = models.CharField(max_length=20, unique=True, blank=True, null= True)
     address = models.CharField(max_length=200)
     phone = models.CharField(max_length=50)
     image = models.ImageField(default='default.png', upload_to='profile_images')    
@@ -16,7 +14,7 @@ class Profile(models.Model):
     joining_date = models.DateField(blank=True, null= True)  
 
     HEAD_OFFICE = 'HEAD_OFFICE'
-    FACTORY = 'FACTORY'
+    FACTORY = 'FACTORY'       
     OTHERS='OTHERS'
     JOB_LOCATION_CHOICES = [
         (HEAD_OFFICE, 'Head Office'),
@@ -33,4 +31,5 @@ class Profile(models.Model):
     @property
     def last_login(self):
         return self.customer.last_login
+ 
  

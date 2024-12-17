@@ -1,0 +1,38 @@
+<!-- hr/payroll_list.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payroll List</title>
+</head>
+<body>
+    <h1>Payroll List</h1>
+    <a href="{% url 'payroll_create' %}">Create Payroll</a>
+    <table>
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Month</th>
+                <th>Year</th>
+                <th>Net Salary</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for payroll in payrolls %}
+            <tr>
+                <td>{{ payroll.user.username }}</td>
+                <td>{{ payroll.month }}</td>
+                <td>{{ payroll.year }}</td>
+                <td>{{ payroll.net_salary }}</td>
+                <td>
+                    <a href="{% url 'payroll_update' payroll.pk %}">Edit</a>
+                    <a href="{% url 'payroll_delete' payroll.pk %}">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
