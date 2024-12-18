@@ -1,38 +1,80 @@
-<!-- hr/leave_requests_list.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leave Requests List</title>
-</head>
-<body>
-    <h1>Leave Requests</h1>
-    <a href="{% url 'leave_request_create' %}">Create Leave Request</a>
-    <table>
-        <thead>
-            <tr>
-                <th>User</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for request in leave_requests %}
-            <tr>
-                <td>{{ request.user.username }}</td>
-                <td>{{ request.start_date }}</td>
-                <td>{{ request.end_date }}</td>
-                <td>{{ request.status }}</td>
-                <td>
-                    <a href="{% url 'leave_request_update' request.pk %}">Edit</a>
-                    <a href="{% url 'leave_request_delete' request.pk %}">Delete</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</body>
-</html>
+{% extends 'partials/base0.html' %}
+
+{% load static %}
+
+{% block content %}
+<div class="page-wrapper">
+    <div class="page-content">
+        <!--breadcrumb-->
+        <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="breadcrumb-title pe-3">HRM</div>
+            <div class="ps-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0 p-0">
+                        <li class="breadcrumb-item"><a href="{% url 'hr_dashboard' %}"><i class="bx bx-home-alt"></i></a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Leave Requests</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <!--end breadcrumb-->
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
+                <h4 class="mb-0">Leave Requests</h4>
+                <a href="{% url 'leave_request_create' %}" class="btn btn-light btn-sm">+ Create Leave Request</a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>User</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for request in leave_requests %}
+                            <tr>
+                                <td>{{ request.user.username }}</td>
+                                <td>{{ request.start_date }}</td>
+                                <td>{{ request.end_date }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if request.status == 'Approved' %}
+                                            bg-success
+                                        {% elif request.status == 'Pending' %}
+                                            bg-warning
+                                        {% elif request.status == 'Rejected' %}
+                                            bg-danger
+                                        {% else %}
+                                            bg-secondary
+                                        {% endif %}">
+                                        {{ request.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{% url 'leave_request_update' request.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="{% url 'leave_request_delete' request.pk %}" 
+                                       class=" btn btn-sm btn-danger" 
+                                       onclick="return confirm('Are you sure you want to delete this attendance record?');">
+                                        Delete
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center">No leave requests found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -283,7 +283,7 @@
 				{% endif %}   
 
 
-				{% comment %} {% if is_hrm %}	 {% endcomment %}
+				{% if is_hrm %}	
 
 				<li>
 					<a class="has-arrow" href="javascript:;">
@@ -299,12 +299,15 @@
 						</li>
 						<li> <a href="{% url 'attendance_report' %}"><i class="bx bx-right-arrow-alt"></i> Attendance Report</a>
 						</li>
+						<li> <a href="{% url 'leave_requests_list' %}"><i class="bx bx-right-arrow-alt"></i> Leave List</a>
+						</li>
+				
 							
 												
 					</ul>
 				</li>
 				
-				{% comment %} {% endif %}   {% endcomment %}
+				{% endif %}  
 				
 				<!-- <li class="menu-label">Forms & Tables</li>
 				<li>
