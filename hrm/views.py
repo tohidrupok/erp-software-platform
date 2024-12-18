@@ -9,48 +9,71 @@ from .models import Attendance, LeaveRequest, Payroll
 from .forms import AttendanceForm, LeaveRequestForm, PayrollForm
 from django.contrib import messages
 from django.utils.dateparse import parse_date
+from dashboard.decorators import auth_users, allowed_users
 
 # HR/Manager Dashboard
-@login_required
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['HRM'])
+
 def hr_dashboard(request):
-    return render(request, 'hr/dashboard.html')
+    is_hrm = request.user.groups.filter(name='HRM').exists() 
+        
+    return render(request, 'hr/dashboard.html', {'is_hrm': is_hrm})
+
+
 
 # Attendance Management
 from django.contrib.auth.models import User
+from django.utils import timezone 
 
-@login_required
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['HRM'])
 def attendance_list(request):
+
     attendances = Attendance.objects.all()
+
     from_date = request.GET.get('from_date')
     to_date = request.GET.get('to_date')
     user_id = request.GET.get('user')
 
-    # Filter based on from_date and to_date
+    if not from_date and not to_date and not user_id:
+        today = timezone.localdate() 
+        attendances = attendances.filter(date__gte=today) 
+
     if from_date:
         attendances = attendances.filter(date__gte=parse_date(from_date))
+
     if to_date:
         attendances = attendances.filter(date__lte=parse_date(to_date))
+
     if user_id:
         attendances = attendances.filter(user__id=user_id)
 
-    users = User.objects.all()  # Fetch all users
+    users = User.objects.all()
+    
+    is_hrm = request.user.groups.filter(name='HRM').exists() 
 
     return render(
-        request, 
-        'hr/attendance_list.html', 
+        request,
+        'hr/attendance_list.html',
         {
             'attendances': attendances,
             'from_date': from_date,
             'to_date': to_date,
             'user_id': user_id,
-            'users': users,
+            'users': users, 
+            'is_hrm': is_hrm
         }
     ) 
     
-from django.utils.dateparse import parse_date
-from datetime import datetime, timedelta, date  
+    
 
-@login_required
+from datetime import datetime, timedelta, date  
+from datetime import date, timedelta, datetime
+
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['HRM'])
+
 def attendance_report(request):
     from_date = request.GET.get('from_date')
     to_date = request.GET.get('to_date')
@@ -61,11 +84,11 @@ def attendance_report(request):
         from_date = parse_date(from_date)
         to_date = parse_date(to_date)
     else:
-        from_date = date.today() - timedelta(days=7)  # Default: last 7 days
+        from_date = date.today() - timedelta(days=6)  # last 7 days
         to_date = date.today()
 
     users = User.objects.all()
-    report = []
+    report = []      
 
     # If a user is selected, generate the report
     if user_id:
@@ -77,34 +100,54 @@ def attendance_report(request):
         if selected_user:
             current_date = from_date
             user_attendance = Attendance.objects.filter(user=selected_user, date__range=(from_date, to_date))
-            holidays = Holiday.objects.values_list('date', flat=True)  # List of holidays
+            holidays = Holiday.objects.values_list('date', flat=True)
+            leave_days = LeaveRequest.objects.filter(
+                user=selected_user, 
+                status='Approved', 
+                start_date__lte=to_date, 
+                end_date__gte=from_date
+            )
+
+            # Collect all leave dates
+            leave_dates = set()
+            for leave in leave_days:
+                leave_dates.update([leave.start_date + timedelta(days=i) for i in range((leave.end_date - leave.start_date).days + 1)])
+
             attendance_dict = {att.date: att for att in user_attendance}
 
             user_report = []
             present_count = 0
             half_day_count = 0
+            absent_count = 0
+            holiday_count = 0
+            leave_count = 0
 
             while current_date <= to_date:
                 att = attendance_dict.get(current_date)
 
-                # Check if the day is a Friday or a holiday
-                if current_date.weekday() == 4 or current_date in holidays:  # Friday is weekday 4
+                if current_date.weekday() == 4 or current_date in holidays:  # Friday or Holiday
                     status = "Holiday"
                     total_hours = 0
                     late = False
+                    holiday_count += 1
+                elif current_date in leave_dates:  # Approved Leave
+                    status = "Leave"
+                    total_hours = 0
+                    late = False
+                    leave_count += 1
                 elif att:
                     # Check for Late status
                     late = False
-                    if att.check_in_time and att.check_in_time > datetime.strptime("10:00", "%H:%M").time():
+                    if att.check_in_time and att.check_in_time > datetime.strptime("11:00", "%H:%M").time():
                         late = True
 
-                    # Count Present and Half-Day statuses
+                    # Count Present and Half-Day
                     if att.status == "Present":
                         present_count += 1
                     elif att.status == "Half-Day":
                         half_day_count += 1
 
-                    # Calculate total work hours
+                    # Work hours
                     if att.check_in_time and att.check_out_time:
                         work_duration = datetime.combine(date.min, att.check_out_time) - datetime.combine(date.min, att.check_in_time)
                         total_hours = round(work_duration.total_seconds() / 3600, 2)
@@ -113,10 +156,11 @@ def attendance_report(request):
 
                     status = att.status
                 else:
-                    # No attendance for the day, mark as Absent
+                    # No attendance, mark as Absent
                     status = "Absent"
                     total_hours = 0
                     late = False
+                    absent_count += 1
 
                 user_report.append({
                     'date': current_date,
@@ -133,8 +177,11 @@ def attendance_report(request):
                 'attendance': user_report,
                 'present_count': present_count,
                 'half_day_count': half_day_count,
+                'absent_count': absent_count,
+                'holiday_count': holiday_count,
+                'leave_count': leave_count,
             })
-
+    is_hrm = request.user.groups.filter(name='HRM').exists() 
     return render(
         request,
         'hr/attendance_report.html',
@@ -144,12 +191,14 @@ def attendance_report(request):
             'to_date': to_date,
             'users': users,
             'selected_user': user_id,
+            'is_hrm': is_hrm,
         }
     )
-    
+
     
 
-@login_required
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['HRM'])
 def attendance_create(request):
     if request.method == 'POST':
         form = AttendanceForm(request.POST)
@@ -161,7 +210,9 @@ def attendance_create(request):
         form = AttendanceForm()
     return render(request, 'hr/attendance_form.html', {'form': form})
 
-@login_required
+
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['HRM'])
 def attendance_update(request, pk):
     attendance = get_object_or_404(Attendance, pk=pk)
     if request.method == 'POST':
@@ -174,20 +225,26 @@ def attendance_update(request, pk):
         form = AttendanceForm(instance=attendance)
     return render(request, 'hr/attendance_form.html', {'form': form})
 
-@login_required
+
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['HRM'])
 def attendance_delete(request, pk):
     attendance = get_object_or_404(Attendance, pk=pk)
     attendance.delete()
     messages.success(request, 'Attendance record deleted successfully!')
     return redirect('attendance_list')
 
+
 # Leave Request Management
-@login_required
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['HRM'])
 def leave_requests_list(request):
     leave_requests = LeaveRequest.objects.all()
     return render(request, 'hr/leave_requests_list.html', {'leave_requests': leave_requests})
 
-@login_required
+
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['HRM'])
 def leave_request_update(request, pk):
     leave_request = get_object_or_404(LeaveRequest, pk=pk)
     if request.method == 'POST':
@@ -200,12 +257,15 @@ def leave_request_update(request, pk):
         form = LeaveRequestForm(instance=leave_request)
     return render(request, 'hr/leave_request_form.html', {'form': form})
 
-@login_required
+
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['HRM'])
 def leave_request_delete(request, pk):
     leave_request = get_object_or_404(LeaveRequest, pk=pk)
     leave_request.delete()
     messages.success(request, 'Leave request deleted successfully!')
     return redirect('leave_requests_list')
+
 
 # Payroll Management
 @login_required

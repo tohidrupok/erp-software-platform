@@ -1,62 +1,300 @@
+{% extends 'partials/base0.html' %}
+{% block title %}Add Product{% endblock %}
+{% load static %}
+{% load crispy_forms_tags %}
 
-<h2>Attendance Report</h2>
+{% block content %} 
+<div class="page-wrapper">
+    <div class="page-content">
+        <!--breadcrumb-->
+        <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="breadcrumb-title pe-3">HRM</div>
+            <div class="ps-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0 p-0">
+                        <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">Report</li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="ms-auto">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary">Settings</button>
+                    <button type="button" class="btn btn-primary split-bg-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown">	<span class="visually-hidden">Toggle Dropdown</span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-end">	<a class="dropdown-item" href="javascript:;">Action</a>
+                        <a class="dropdown-item" href="javascript:;">Another action</a>
+                        <a class="dropdown-item" href="javascript:;">Something else here</a>
+                        <div class="dropdown-divider"></div>	<a class="dropdown-item" href="javascript:;">Separated link</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--end breadcrumb-->
 
-<!-- Filter Form -->
-<form method="get" action="">
-    <label for="from_date">From Date:</label>
-    <input type="date" id="from_date" name="from_date" value="{{ from_date }}">
 
-    <label for="to_date">To Date:</label>
-    <input type="date" id="to_date" name="to_date" value="{{ to_date }}">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Attendance Report</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+        <style>
+            /* Global Styles */
+            body {
+                font-family: 'Arial', sans-serif;
+                background-color: #f4f8fb;
+                margin: 0;
+                padding: 0;
+            }
+    
+            h2 {
+                text-align: center;
+                margin-bottom: 20px;
+                color: #2c3e50;
+            }
+    
+            /* Form Styling */
+            form {
+                background: #ffffff;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                margin-bottom: 20px;
+            }
+    
+            form label {
+                font-weight: bold;
+                margin-bottom: 5px;
+                display: block;
+            }
+    
+            form .form-control,
+            form .form-select {
+                border-radius: 6px;
+                border: 1px solid #ced4da;
+            }
+    
+            form button {
+                background-color: #5cdb95;
+                color: white;
+                font-weight: bold;
+                border: none;
+                border-radius: 6px;
+                padding: 10px 20px;
+            }
+    
+            form button:hover {
+                background-color: #379683;
+            }
+    
+            /* Report Section */
+            .report-section {
+                background: #ffffff;
+                border-radius: 8px;
+                padding: 20px;
+                margin-bottom: 20px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+    
+            .report-section h3 {
+                color: #1d3557;
+                font-weight: bold;
+            }
+    
+            /* Table Styling */
+            .report-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 15px;
+            }
+    
+            .report-table th {
+                background-color: #457b9d;
+                color: white;
+                text-align: center;
+                padding: 10px;
+            }
+    
+            .report-table td {
+                text-align: center;
+                padding: 8px;
+            }
+    
+            .report-table tr:nth-child(even) {
+                background-color: #f8f9fa;
+            }
+    
+            .report-table tr:nth-child(odd) {
+                background-color: #e9ecef;
+            }
+    
+            /* Summary Section */
+            .summary-box {
+                background: #f0f4f8;
+                border-radius: 8px;
+                padding: 15px;
+                margin-top: 20px;
+            }
+    
+            .summary-box p {
+                margin: 5px 0;
+                font-weight: bold;
+            }
+    
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                form {
+                    padding: 15px;
+                }
+    
+                .report-table th,
+                .report-table td {
+                    font-size: 12px;
+                    padding: 6px;
+                }
+    
+                .summary-box {
+                    padding: 10px;
+                }
+    
+                .summary-box p {
+                    font-size: 14px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+    
+        <h2>Attendance Report</h2>
+    
+        <!-- Filter Form -->
+        <form method="get" action="">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="from_date">From Date:</label>
+                    <input type="date" id="from_date" name="from_date" class="form-control" value="{{ from_date }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="to_date">To Date:</label>
+                    <input type="date" id="to_date" name="to_date" class="form-control" value="{{ to_date }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="user">User:</label>
+                    <select name="user" id="user" class="form-select">
+                        <option value="">-- Select User --</option>
+                        {% for user in users %}
+                        <option value="{{ user.id }}" {% if selected_user == user.id|stringformat:"s" %}selected{% endif %}>
+                            {{ user.username }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end mt-3">
+                <button type="submit" class="btn btn-success">Generate Report</button>
+            </div>
+        </form>
+    
+        {% if report %}
+            {% for user_data in report %}
+            <div class="report-section">
+                <h3>Attendance Report for {{ user_data.user.username }}</h3>
+                <div class="table-responsive">
+                    <table class="report-table table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Check-in Time</th>
+                                <th>Check-out Time</th>
+                                <th>Total Hours Worked</th>
+                                <th>Late</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in user_data.attendance %}
+                            <tr>
+                                <td>{{ record.date }}</td>
+                                <td>
+                                    {% if record.status == 'Present' %}
+                                        <span class="badge bg-success">{{ record.status }}</span> 
 
-    <label for="user">User:</label>
-    <select name="user" id="user">
-        <option value="">-- Select User --</option>
-        {% for user in users %}
-        <option value="{{ user.id }}" {% if selected_user == user.id|stringformat:"s" %}selected{% endif %}>
-            {{ user.username }}
-        </option>
-        {% endfor %}
-    </select>
+                                    {% elif record.status == 'Half-Day' %}
+                                        <span class="badge bg-success">{{ record.status }}</span> 
 
-    <button type="submit">Generate Report</button>
-</form>
+                                    {% elif record.status == 'Absent' %}
+                                        <span class="badge bg-danger">{{ record.status }}</span> 
 
-{% if report %}
-    {% for user_data in report %}
-    <h3>Attendance Report for {{ user_data.user.username }}</h3>
-    <table border="1" style="margin-top: 20px; width: 100%; border-collapse: collapse;">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Check-in Time</th>
-                <th>Check-out Time</th>
-                <th>Total Hours Worked</th>
-                <th>Late</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for record in user_data.attendance %}
-            <tr>
-                <td>{{ record.date }}</td>
-                <td>{{ record.status }}</td>
-                <td>{{ record.check_in_time|default:"-" }}</td>
-                <td>{{ record.check_out_time|default:"-" }}</td>
-                <td>{{ record.total_hours }}</td>
-                <td>{% if record.late %}Yes{% else %}No{% endif %}</td>
-            </tr>
+                                    {% else %}
+                                        <span class="badge bg-warning">{{ record.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ record.check_in_time|default:"-" }}</td>
+                                <td>{{ record.check_out_time|default:"-" }}</td>
+                                <td>{{ record.total_hours }}h</td>
+                                <td>{% if record.late %}Yes{% else %}No{% endif %}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+    
+                <div class="summary-box">
+                    <p>Total Present Days: <span class="text-success">{{ user_data.present_count }}</span></p>
+                    <p>Total Half-Day Days: <span class="text-warning">{{ user_data.half_day_count }}</span></p>
+                    <p>Total Leave Days: <span class="text-info">{{ user_data.leave_count }}</span></p>
+                    <p>Total Holidays: <span class="text-primary">{{ user_data.holiday_count }}</span></p>
+                    <p>Total Absent Days: <span class="text-danger">{{ user_data.absent_count }}</span></p>
+                </div>
+            </div>
             {% endfor %}
-        </tbody>
-    </table>
+        {% else %}
+            <p class="text-center text-muted">Please select a user and date range to generate the report.</p>
+        {% endif %}
+    
+    </body>
 
-    <div style="margin-top: 20px;">
-        <strong>Total Present Days:</strong> {{ user_data.present_count }} <br>
-        <strong>Total Half-Day Days:</strong> {{ user_data.half_day_count }}
-    </div> 
+    
+    
+    
+             
 
-    {% endfor %}
-{% else %}
-    <p>Please select a user and date range to generate the report.</p>
-{% endif %}
+
+    </div>
+</div>
+
+
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

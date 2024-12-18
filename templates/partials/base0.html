@@ -280,7 +280,31 @@
 					</ul>
 				</li>
 				
-				{% endif %}  
+				{% endif %}   
+
+
+				{% comment %} {% if is_hrm %}	 {% endcomment %}
+
+				<li>
+					<a class="has-arrow" href="javascript:;">
+						<div style="color: #FFFFFF; " class="parent-icon"><i class='bx bx-message-square-edit'></i>
+						</div>
+						<div class="menu-title" style="color: #FFFFFF;">HRM</div>
+					</a>
+					<ul>
+						
+						<li> <a href="{% url 'hr_dashboard' %}"><i class="bx bx-right-arrow-alt"></i>Dashboard</a>
+						</li>
+						<li> <a href="{% url 'attendance_list' %}"><i class="bx bx-right-arrow-alt"></i>Attendance List</a>
+						</li>
+						<li> <a href="{% url 'attendance_report' %}"><i class="bx bx-right-arrow-alt"></i> Attendance Report</a>
+						</li>
+							
+												
+					</ul>
+				</li>
+				
+				{% comment %} {% endif %}   {% endcomment %}
 				
 				<!-- <li class="menu-label">Forms & Tables</li>
 				<li>

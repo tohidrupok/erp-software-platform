@@ -24,13 +24,16 @@ def base(request):
     is_rsm = request.user.groups.filter(name='RSM').exists()
     is_hos = request.user.groups.filter(name='HOS').exists() 
     is_finance = request.user.groups.filter(name='Finance').exists() 
-    print(is_finance)
+    is_hrm = request.user.groups.filter(name='HRM').exists() 
+
+
     context = {
         'is_sr': is_sr,
         'is_dealer': is_dealer,
         'is_rsm': is_rsm,
         'is_hos': is_hos,
         'is_finance': is_finance,
+        'is_hrm': is_hrm,     
 
     }
     return render(request, 'dashboard/base.html', context)
