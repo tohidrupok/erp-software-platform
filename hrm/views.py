@@ -10,6 +10,7 @@ from .forms import AttendanceForm, LeaveRequestForm, PayrollForm
 from django.contrib import messages
 from django.utils.dateparse import parse_date
 from dashboard.decorators import auth_users, allowed_users
+from django.utils import timezone 
 
 # HR/Manager Dashboard
 @login_required(login_url='user-login')
@@ -23,8 +24,8 @@ def hr_dashboard(request):
 
 
 # Attendance Management
-from django.contrib.auth.models import User
-from django.utils import timezone 
+
+
 
 @login_required(login_url='user-login')
 @allowed_users(allowed_roles=['HRM'])
@@ -65,8 +66,7 @@ def attendance_list(request):
             'is_hrm': is_hrm
         }
     ) 
-    
-    
+        
 
 from datetime import datetime, timedelta, date  
 from datetime import date, timedelta, datetime
@@ -208,7 +208,9 @@ def attendance_create(request):
             return redirect('attendance_list')
     else:
         form = AttendanceForm()
-    return render(request, 'hr/attendance_form.html', {'form': form})
+    
+    is_hrm = request.user.groups.filter(name='HRM').exists() 
+    return render(request, 'hr/attendance_form.html', {'form': form, 'is_hrm': is_hrm,})
 
 
 @login_required(login_url='user-login')
@@ -223,7 +225,9 @@ def attendance_update(request, pk):
             return redirect('attendance_list')
     else:
         form = AttendanceForm(instance=attendance)
-    return render(request, 'hr/attendance_form.html', {'form': form})
+        
+    is_hrm = request.user.groups.filter(name='HRM').exists() 
+    return render(request, 'hr/attendance_form.html', {'form': form, 'is_hrm': is_hrm})
 
 
 @login_required(login_url='user-login')
@@ -232,6 +236,7 @@ def attendance_delete(request, pk):
     attendance = get_object_or_404(Attendance, pk=pk)
     attendance.delete()
     messages.success(request, 'Attendance record deleted successfully!')
+    
     return redirect('attendance_list')
 
 
@@ -240,7 +245,26 @@ def attendance_delete(request, pk):
 @allowed_users(allowed_roles=['HRM'])
 def leave_requests_list(request):
     leave_requests = LeaveRequest.objects.all()
-    return render(request, 'hr/leave_requests_list.html', {'leave_requests': leave_requests})
+    is_hrm = request.user.groups.filter(name='HRM').exists() 
+    return render(request, 'hr/leave_requests_list.html', {'leave_requests': leave_requests, 'is_hrm': is_hrm,})
+
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['HRM'])
+def leave_requests(request):
+    
+    if request.method == 'POST':
+        form = LeaveRequestForm(request.POST)
+        if form.is_valid():
+            leave_request = form.save(commit=False)
+            leave_request.save()
+            messages.success(request, "Leave request submitted successfully!")
+            return redirect('leave_requests_list')
+    else:
+        form = LeaveRequestForm()
+
+    leave_requests = LeaveRequest.objects.filter(user=request.user).order_by('-requested_at')
+    context = {'form': form, 'leave_requests': leave_requests}
+    return render(request, 'hr/leave_requests.html', context) 
 
 
 @login_required(login_url='user-login')
@@ -255,7 +279,9 @@ def leave_request_update(request, pk):
             return redirect('leave_requests_list')
     else:
         form = LeaveRequestForm(instance=leave_request)
-    return render(request, 'hr/leave_request_form.html', {'form': form})
+        
+    is_hrm = request.user.groups.filter(name='HRM').exists() 
+    return render(request, 'hr/leave_request_form.html', {'form': form, 'is_hrm': is_hrm})
 
 
 @login_required(login_url='user-login')
@@ -329,22 +355,7 @@ def payroll_delete(request, pk):
 #     return render(request, 'hrm/attendance_list.html', {'attendance_records': attendance_records})
 
 # Leave Request List and Create View
-@login_required
-def leave_requests(request):
-    if request.method == 'POST':
-        form = LeaveRequestForm(request.POST)
-        if form.is_valid():
-            leave_request = form.save(commit=False)
-            leave_request.user = request.user
-            leave_request.save()
-            messages.success(request, "Leave request submitted successfully!")
-            return redirect('leave_requests')
-    else:
-        form = LeaveRequestForm()
 
-    leave_requests = LeaveRequest.objects.filter(user=request.user).order_by('-requested_at')
-    context = {'form': form, 'leave_requests': leave_requests}
-    return render(request, 'hrm/leave_requests.html', context)
 
 # # Payroll View
 # @login_required

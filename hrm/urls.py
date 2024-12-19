@@ -13,7 +13,8 @@ urlpatterns = [
     path('attendance-report/', views.attendance_report, name='attendance_report'),
 
     # Leave Request Management
-    path('leave-requests/', views.leave_requests_list, name='leave_requests_list'),
+    path('leave-list/', views.leave_requests_list, name='leave_requests_list'),
+    path('leave-request/', views.leave_requests, name='leave_requests'),
     path('leave-request/update/<int:pk>/', views.leave_request_update, name='leave_request_update'),
     path('leave-request/delete/<int:pk>/', views.leave_request_delete, name='leave_request_delete'),
 
