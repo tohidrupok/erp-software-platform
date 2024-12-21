@@ -202,7 +202,7 @@ def attendance_report(request):
 def attendance_create(request):
     if request.method == 'POST':
         form = AttendanceForm(request.POST)
-        if form.is_valid():
+        if form.is_valid():    
             form.save()
             messages.success(request, 'Attendance record created successfully!')
             return redirect('attendance_list')
@@ -262,8 +262,11 @@ def leave_requests(request):
     else:
         form = LeaveRequestForm()
 
-    leave_requests = LeaveRequest.objects.filter(user=request.user).order_by('-requested_at')
-    context = {'form': form, 'leave_requests': leave_requests}
+    leave_requests = LeaveRequest.objects.all().order_by('-requested_at')[:20]
+    
+    
+    is_hrm = request.user.groups.filter(name='HRM').exists() 
+    context = {'form': form, 'leave_requests': leave_requests,'is_hrm': is_hrm}
     return render(request, 'hr/leave_requests.html', context) 
 
 
