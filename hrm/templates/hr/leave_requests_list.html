@@ -5,7 +5,7 @@
 {% block content %}
 <div class="page-wrapper">
     <div class="page-content">
-        <!--breadcrumb-->
+        <!-- Breadcrumb -->
         <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
             <div class="breadcrumb-title pe-3">HRM</div>
             <div class="ps-3">
@@ -17,57 +17,68 @@
                 </nav>
             </div>
         </div>
-        <!--end breadcrumb-->
+        <!-- End Breadcrumb -->
 
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
                 <h4 class="mb-0">Leave Requests</h4>
-                <a href="{% url 'leave_request_create' %}" class="btn btn-light btn-sm">+ Create Leave Request</a>
+                <a href="{% url 'leave_request_create' %}" class="btn btn-light btn-sm">
+                    <i class="fas fa-plus"></i> Create Leave Request
+                </a>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover">
-                        <thead class="table-primary">
+                    <table class="table table-bordered table-hover table-striped">
+                        <thead class="table-primary text-center">
                             <tr>
                                 <th>User</th>
+                                <th>Apply Date</th>
                                 <th>Start Date</th>
                                 <th>End Date</th>
+                                <th>Days</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for request in leave_requests %}
-                            <tr>
+                            <tr class="text-center">
                                 <td>{{ request.user.username }}</td>
-                                <td>{{ request.start_date }}</td>
-                                <td>{{ request.end_date }}</td>
+                                <td>{{ request.requested_at|date:"M d, Y" }}</td>
+                                <td>{{ request.start_date|date:"M d, Y" }}</td>
+                                <td>{{ request.end_date|date:"M d, Y" }}</td>
+                                <td>{{ request.days_difference }}</td>
                                 <td>
                                     <span class="badge 
-                                        {% if request.status == 'Approved' %}
-                                            bg-success
-                                        {% elif request.status == 'Pending' %}
-                                            bg-warning
-                                        {% elif request.status == 'Rejected' %}
-                                            bg-danger
-                                        {% else %}
-                                            bg-secondary
+                                        {% if request.status == 'Approved' %} bg-success
+                                        {% elif request.status == 'Pending' %} bg-warning
+                                        {% elif request.status == 'Rejected' %} bg-danger
+                                        {% else %} bg-secondary
                                         {% endif %}">
                                         {{ request.status }}
                                     </span>
                                 </td>
-                                <td>
-                                    <a href="{% url 'leave_request_update' request.pk %}" class="btn btn-sm btn-warning">Edit</a>
-                                    <a href="{% url 'leave_request_delete' request.pk %}" 
-                                       class=" btn btn-sm btn-danger" 
-                                       onclick="return confirm('Are you sure you want to delete this attendance record?');">
-                                        Delete
+                                <td class="d-flex justify-content-center">
+                                    <a href="{% url 'approve_leave' request.id %}" class="btn btn-outline-success btn-sm mx-1" title="Approve">
+                                        <i class="fas fa-check"></i>
+                                    </a>
+                                    <a href="{% url 'reject_leave' request.id %}" class="btn btn-outline-danger btn-sm mx-1" title="Reject">
+                                        <i class="fas fa-times"></i>
+                                    </a>
+                                    <a href="{% url 'leave_request_update' request.id %}" class="btn btn-outline-primary btn-sm mx-1" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'leave_request_delete' request.id %}" 
+                                       class="btn btn-outline-danger btn-sm mx-1" 
+                                       title="Delete"
+                                       onclick="return confirm('Are you sure you want to delete this record?');">
+                                        <i class="fas fa-trash"></i>
                                     </a>
                                 </td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="5" class="text-center">No leave requests found.</td>
+                                <td colspan="7" class="text-center">No leave requests found.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -78,3 +89,46 @@
     </div>
 </div>
 {% endblock %}
+
+<!-- Font Awesome for Icons -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+<style>
+/* General Table Styles */
+.table-hover tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f9f9f9;
+}
+
+/* Mobile Optimization */
+@media (max-width: 768px) {
+    .page-breadcrumb {
+        flex-direction: column;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .table th, .table td {
+        font-size: 0.9rem;
+        white-space: nowrap;
+    }
+
+    .card-header h4 {
+        font-size: 1.25rem;
+    }
+
+    .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .breadcrumb-title, .breadcrumb-item a {
+        font-size: 0.9rem;
+    }
+}
+</style>

@@ -244,9 +244,42 @@ def attendance_delete(request, pk):
 @login_required(login_url='user-login')
 @allowed_users(allowed_roles=['HRM'])
 def leave_requests_list(request):
-    leave_requests = LeaveRequest.objects.all()
-    is_hrm = request.user.groups.filter(name='HRM').exists() 
-    return render(request, 'hr/leave_requests_list.html', {'leave_requests': leave_requests, 'is_hrm': is_hrm,})
+    # Fetch all requests
+    requests = LeaveRequest.objects.all().order_by('-requested_at')
+    request_data = []
+
+    for req in requests:
+        # Calculate the difference in days between end_date and start_date
+        days_difference = (req.end_date - req.start_date).days + 1
+        request_data.append({
+            'id': req.id,
+            'user':req.user,
+            'requested_at':req.requested_at,
+            'start_date': req.start_date,
+            'end_date': req.end_date,
+            'days_difference': days_difference,
+            'status': req.status,  # Assuming a 'status' field exists in your model
+        })
+    is_hrm = request.user.groups.filter(name='HRM').exists()  
+    
+    return render(request, 'hr/leave_requests_list.html', {'leave_requests': request_data, 'is_hrm':is_hrm})
+
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['HRM'])
+def approve_leave(request, pk):
+    leave_request = get_object_or_404(LeaveRequest, pk=pk)
+    leave_request.status = 'Approved'
+    leave_request.save()
+    return redirect('leave_requests_list') 
+
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['HRM'])
+def reject_leave(request, pk):
+    leave_request = get_object_or_404(LeaveRequest, pk=pk)
+    leave_request.status = 'Rejected'
+    leave_request.save()
+    return redirect('leave_requests_list')
+
 
 @login_required(login_url='user-login')
 @allowed_users(allowed_roles=['HRM'])

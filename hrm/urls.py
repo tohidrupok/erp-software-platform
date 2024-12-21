@@ -14,6 +14,8 @@ urlpatterns = [
 
     # Leave Request Management
     path('leave-list/', views.leave_requests_list, name='leave_requests_list'),
+    path('approve_leave/<int:pk>/', views.approve_leave, name='approve_leave'),
+    path('reject_leave/<int:pk>/', views.reject_leave, name='reject_leave'),
     path('leave-request/', views.leave_requests, name='leave_requests'),
     path('leave-request/update/<int:pk>/', views.leave_request_update, name='leave_request_update'),
     path('leave-request/delete/<int:pk>/', views.leave_request_delete, name='leave_request_delete'),
