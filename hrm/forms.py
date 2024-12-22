@@ -1,5 +1,5 @@
 from django import forms
-from .models import LeaveRequest, Attendance, LeaveRequest, Payroll
+from .models import LeaveRequest, Attendance, LeaveRequest, Payroll, LeaveBalance
 
 class LeaveRequestForm(forms.ModelForm):
     class Meta:
@@ -31,6 +31,17 @@ class LeaveRequestForm(forms.ModelForm):
         widgets = {
             'start_date': forms.DateInput(attrs={'type': 'date'}),
             'end_date': forms.DateInput(attrs={'type': 'date'}),
+        }
+        
+        
+class LeaveBalanceForm(forms.ModelForm):
+    class Meta:
+        model = LeaveBalance
+        fields = ['user','total_leaves', 'used_leaves', 'carry_forward']
+        widgets = {
+            'total_leaves': forms.NumberInput(attrs={'class': 'form-control'}),
+            'used_leaves': forms.NumberInput(attrs={'class': 'form-control'}),
+            'carry_forward': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
 # Payroll Form

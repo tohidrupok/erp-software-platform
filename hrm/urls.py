@@ -19,6 +19,12 @@ urlpatterns = [
     path('leave-request/', views.leave_requests, name='leave_requests'),
     path('leave-request/update/<int:pk>/', views.leave_request_update, name='leave_request_update'),
     path('leave-request/delete/<int:pk>/', views.leave_request_delete, name='leave_request_delete'),
+    
+    path('leave-balance/', views.leave_balance_view, name='leave_balance_view'),
+    path('create-leave-balance/', views.create_leave_balance, name='create_leave_balance'),
+    path('leave-balances-list/', views.manage_leave_balances, name='manage_leave_balances'),
+    path('edit-leave-balance/<int:pk>/', views.edit_leave_balance, name='edit_leave_balance'),
+    path('delete-leave-balance/<int:pk>/', views.delete_leave_balance, name='delete_leave_balance'),
 
     # Payroll Management
     path('payroll/', views.payroll_list, name='payroll_list'),

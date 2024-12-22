@@ -51,7 +51,26 @@ class LeaveRequest(models.Model):
 
     def __str__(self):
         return f"Leave: {self.user.username} ({self.status})"
+    
 
+from django.utils.timezone import now 
+
+class LeaveBalance(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="leave_balance")
+    year = models.IntegerField(default=now().year)  
+    total_leaves = models.IntegerField(default=24)  
+    used_leaves = models.IntegerField(default=0)   
+    carry_forward = models.IntegerField(default=0) 
+
+    def remaining_leaves(self):
+        """Calculate remaining leaves."""
+        return self.total_leaves + self.carry_forward - self.used_leaves
+
+    def __str__(self):
+        return f"{self.user.username} - {self.year} Leave Balance"  
+    
+    
+    
 class Payroll(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)  
     month = models.CharField(max_length=20)

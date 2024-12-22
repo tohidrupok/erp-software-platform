@@ -5,8 +5,8 @@ from .models import Attendance, LeaveRequest, Payroll, PerformanceReview, Bonus,
 from .forms import LeaveRequestForm
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-from .models import Attendance, LeaveRequest, Payroll
-from .forms import AttendanceForm, LeaveRequestForm, PayrollForm
+from .models import Attendance, LeaveRequest, Payroll, LeaveBalance
+from .forms import AttendanceForm, LeaveRequestForm, LeaveBalanceForm,  PayrollForm
 from django.contrib import messages
 from django.utils.dateparse import parse_date
 from dashboard.decorators import auth_users, allowed_users
@@ -327,6 +327,76 @@ def leave_request_delete(request, pk):
     leave_request.delete()
     messages.success(request, 'Leave request deleted successfully!')
     return redirect('leave_requests_list')
+
+@login_required
+def leave_balance_view(request):
+    
+    users = User.objects.all() 
+    selected_user_id = request.GET.get('user_id')  
+    selected_user = None
+    leave_balances = []
+
+    if selected_user_id:
+        selected_user = get_object_or_404(User, id=selected_user_id)
+        leave_balances = LeaveBalance.objects.filter(user=selected_user)
+    
+    is_hrm = request.user.groups.filter(name='HRM').exists()
+    context = {
+        'users': users,
+        'selected_user': selected_user,
+        'leave_balances': leave_balances,
+        'is_hrm': is_hrm
+    }
+    return render(request, 'hr/leave_balance.html', context)
+
+
+def create_leave_balance(request):
+    
+    if request.method == 'POST':
+        form = LeaveBalanceForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('create_leave_balance')
+    else:
+        form = LeaveBalanceForm()
+        
+    is_hrm = request.user.groups.filter(name='HRM').exists()    
+        
+    context = {'form': form, 'is_hrm': is_hrm}
+    return render(request, 'hr/create_leave_balance.html', context)
+
+
+def manage_leave_balances(request):
+    
+    leave_balances = LeaveBalance.objects.all()
+    is_hrm = request.user.groups.filter(name='HRM').exists()  
+    
+    context = {'leave_balances': leave_balances, 'is_hrm': is_hrm}
+    return render(request, 'hr/manage_leave_balances.html', context)
+
+
+def edit_leave_balance(request, pk):
+    
+    leave_balance = get_object_or_404(LeaveBalance, pk=pk)
+    if request.method == 'POST':
+        form = LeaveBalanceForm(request.POST, instance=leave_balance)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_leave_balances')
+    else:
+        form = LeaveBalanceForm(instance=leave_balance)
+    context = {'form': form, 'leave_balance': leave_balance}
+    return render(request, 'hr/edit_leave_balance.html', context)
+
+
+def delete_leave_balance(request, pk):
+    
+    leave_balance = get_object_or_404(LeaveBalance, pk=pk)
+    if request.method == 'POST':
+        leave_balance.delete()
+        return redirect('manage_leave_balances')
+    context = {'leave_balance': leave_balance}
+    return render(request, 'hr/delete_leave_balance.html', context)
 
 
 # Payroll Management
