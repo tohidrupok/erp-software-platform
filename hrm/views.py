@@ -11,6 +11,7 @@ from django.contrib import messages
 from django.utils.dateparse import parse_date
 from dashboard.decorators import auth_users, allowed_users
 from django.utils import timezone 
+from django.utils.timezone import now
 
 # HR/Manager Dashboard
 @login_required(login_url='user-login')
@@ -21,12 +22,7 @@ def hr_dashboard(request):
         
     return render(request, 'hr/dashboard.html', {'is_hrm': is_hrm})
 
-
-
 # Attendance Management
-
-
-
 @login_required(login_url='user-login')
 @allowed_users(allowed_roles=['HRM'])
 def attendance_list(request):
@@ -267,10 +263,24 @@ def leave_requests_list(request):
 @login_required(login_url='user-login')
 @allowed_users(allowed_roles=['HRM'])
 def approve_leave(request, pk):
+
     leave_request = get_object_or_404(LeaveRequest, pk=pk)
+    leave_balance = LeaveBalance.objects.filter(user=leave_request.user, year=now().year).first()
+
+    if not leave_balance:
+        
+        return redirect('leave_requests_list')
+
+    days_difference = (leave_request.end_date - leave_request.start_date).days + 1
+
     leave_request.status = 'Approved'
+    
+    leave_balance.used_leaves += days_difference
+    leave_balance.save()
     leave_request.save()
+
     return redirect('leave_requests_list') 
+
 
 @login_required(login_url='user-login')
 @allowed_users(allowed_roles=['HRM'])

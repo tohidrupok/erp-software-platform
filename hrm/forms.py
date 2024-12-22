@@ -37,7 +37,7 @@ class LeaveRequestForm(forms.ModelForm):
 class LeaveBalanceForm(forms.ModelForm):
     class Meta:
         model = LeaveBalance
-        fields = ['user','total_leaves', 'used_leaves', 'carry_forward']
+        fields = ['user','year','total_leaves', 'used_leaves', 'carry_forward']
         widgets = {
             'total_leaves': forms.NumberInput(attrs={'class': 'form-control'}),
             'used_leaves': forms.NumberInput(attrs={'class': 'form-control'}),
