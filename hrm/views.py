@@ -338,7 +338,8 @@ def leave_request_delete(request, pk):
     messages.success(request, 'Leave request deleted successfully!')
     return redirect('leave_requests_list')
 
-@login_required
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['HRM'])
 def leave_balance_view(request):
     
     users = User.objects.all() 
@@ -360,6 +361,8 @@ def leave_balance_view(request):
     return render(request, 'hr/leave_balance.html', context)
 
 
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['HRM'])
 def create_leave_balance(request):
     
     if request.method == 'POST':
@@ -376,6 +379,8 @@ def create_leave_balance(request):
     return render(request, 'hr/create_leave_balance.html', context)
 
 
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['HRM'])
 def manage_leave_balances(request):
     
     leave_balances = LeaveBalance.objects.all()
@@ -385,6 +390,8 @@ def manage_leave_balances(request):
     return render(request, 'hr/manage_leave_balances.html', context)
 
 
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['HRM'])
 def edit_leave_balance(request, pk):
     
     leave_balance = get_object_or_404(LeaveBalance, pk=pk)
@@ -399,6 +406,8 @@ def edit_leave_balance(request, pk):
     return render(request, 'hr/edit_leave_balance.html', context)
 
 
+@login_required(login_url='user-login')
+@allowed_users(allowed_roles=['HRM'])
 def delete_leave_balance(request, pk):
     
     leave_balance = get_object_or_404(LeaveBalance, pk=pk)
